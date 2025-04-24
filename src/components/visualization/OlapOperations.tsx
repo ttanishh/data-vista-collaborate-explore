@@ -5,7 +5,7 @@ import {
   ChevronDown as ArrowDown, 
   Slice, 
   Columns2, 
-  BarChart3 as Pivot 
+  BarChart3 
 } from "lucide-react";
 import { 
   Table, 
@@ -46,7 +46,6 @@ const OlapOperations: React.FC = () => {
     value2: 'USA'
   });
   
-  // Get unique values for each field to use in dropdowns
   const uniqueValues = useMemo(() => {
     const fields: Record<string, Set<string>> = {};
     
@@ -59,7 +58,6 @@ const OlapOperations: React.FC = () => {
       });
     });
     
-    // Convert sets to arrays
     return Object.entries(fields).reduce((acc, [key, set]) => {
       acc[key] = Array.from(set);
       return acc;
@@ -68,23 +66,20 @@ const OlapOperations: React.FC = () => {
   
   const columnKeys = useMemo(() => {
     if (!initialData.length) return [];
-    return Object.keys(initialData[0]).filter(key => key !== 'category'); // Exclude category for simplicity
+    return Object.keys(initialData[0]).filter(key => key !== 'category');
   }, []);
   
-  // Process data based on the selected operation
   const processedData = useMemo(() => {
     switch (operation) {
       case 'rollup': {
-        // Roll up from city to state level (remove city dimension, sum sales)
         const result = initialData.reduce((acc, row) => {
-          // Create a key that uniquely identifies a group (everything except city and sales)
           const key = `${row.date}-${row.country}-${row.state}-${row.product}`;
           
           if (!acc[key]) {
             acc[key] = { ...row };
-            delete acc[key].city; // Remove city dimension
+            delete acc[key].city;
           } else {
-            acc[key].sales += row.sales; // Sum the sales
+            acc[key].sales += row.sales;
           }
           
           return acc;
@@ -94,19 +89,15 @@ const OlapOperations: React.FC = () => {
       }
       
       case 'drilldown':
-        // Drill-down is already the original data (most granular)
         return initialData;
         
       case 'slice': {
-        // Filter data where the specified field equals the specified value
         return initialData.filter(row => {
           return row[sliceField as keyof typeof row] === sliceValue;
         });
       }
       
       case 'dice': {
-        // Filter data where multiple conditions are met
-        // For dice: (Product = "iPhone" OR "Samsung TV") AND (Country = "USA")
         return initialData.filter(row => {
           const values1 = diceFields.value1.split(',').map(v => v.trim());
           const values2 = diceFields.value2.split(',').map(v => v.trim());
@@ -119,19 +110,16 @@ const OlapOperations: React.FC = () => {
       }
       
       case 'pivot': {
-        // Pivot the data: dates as rows, products as columns
         const pivotedData: Record<string, any> = {};
         const products = Array.from(new Set(initialData.map(row => row.product)));
         
         initialData.forEach(row => {
           if (!pivotedData[row.date]) {
             pivotedData[row.date] = { date: row.date };
-            // Initialize all product columns to empty
             products.forEach(product => {
               pivotedData[row.date][product] = '';
             });
           }
-          // Set the sales value in the corresponding product column
           pivotedData[row.date][row.product] = row.sales;
         });
         
@@ -144,16 +132,13 @@ const OlapOperations: React.FC = () => {
     }
   }, [operation, sliceField, sliceValue, diceFields]);
   
-  // Get column headers based on data and operation
   const columns = useMemo(() => {
     if (!processedData.length) return [];
     
     if (operation === 'pivot') {
-      // For pivot, use date and product names as columns
       return ['date', ...Array.from(new Set(initialData.map(row => row.product)))];
     }
     
-    // For other operations, use the keys from the first data item
     return Object.keys(processedData[0]);
   }, [processedData, operation]);
 
@@ -184,7 +169,6 @@ const OlapOperations: React.FC = () => {
           <OlapCube3D operation={operation} />
         </div>
 
-        {/* Controls for specific operations */}
         {operation === 'slice' && (
           <div className="flex flex-wrap gap-4 items-center p-3 bg-muted/40 rounded-md">
             <div className="flex items-center gap-2">
@@ -221,7 +205,7 @@ const OlapOperations: React.FC = () => {
           <div className="flex flex-col gap-3 p-3 bg-muted/40 rounded-md">
             <div className="flex items-center gap-2">
               <Columns2 className="h-5 w-5 text-primary/70" />
-              <span className="font-medium">Dice on:</span>
+              <span>Dice on:</span>
             </div>
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -285,7 +269,6 @@ const OlapOperations: React.FC = () => {
           </div>
         )}
         
-        {/* Operation explanations */}
         <div className="text-sm p-3 rounded-md bg-blue-50 dark:bg-blue-950/20 text-muted-foreground border border-blue-100 dark:border-blue-900/30">
           {operation === 'original' && (
             <div className="flex items-start gap-2">
@@ -324,13 +307,12 @@ const OlapOperations: React.FC = () => {
           
           {operation === 'pivot' && (
             <div className="flex items-start gap-2">
-              <Pivot className="h-4 w-4 mt-0.5 text-blue-500" />
+              <BarChart3 className="h-4 w-4 mt-0.5 text-blue-500" />
               <span>Pivot transforms the data presentation, showing Products as columns and Dates as rows.</span>
             </div>
           )}
         </div>
         
-        {/* Data table */}
         <div className="rounded-md border overflow-hidden">
           <Table>
             <TableCaption>
