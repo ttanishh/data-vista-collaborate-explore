@@ -12,34 +12,62 @@ import {
 } from 'recharts';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export const StockAnalyzer = () => {
+interface StockAnalyzerProps {
+  userUploadedData?: any[] | null;
+}
+
+export const StockAnalyzer = ({ userUploadedData }: StockAnalyzerProps) => {
   const [data, setData] = useState<any[]>([]);
   const [alerts, setAlerts] = useState<string[]>([]);
 
   useEffect(() => {
-    let basePrice = 100;
-    let time = 0;
-    
-    const interval = setInterval(() => {
-      // Simulate price changes
-      const change = (Math.random() - 0.5) * 5;
-      const newPrice = basePrice + change;
-      basePrice = newPrice;
+    if (userUploadedData) {
+      // Process user data if available
+      const processedData = userUploadedData.map((item, index) => ({
+        time: index,
+        price: Number(item.price || item.value || item.count || 0)
+      }));
       
-      // Detect significant changes
-      if (Math.abs(change) > 3) {
-        const alertType = change > 0 ? 'spike' : 'drop';
-        setAlerts(prev => [...prev, `${alertType.toUpperCase()}: $${Math.abs(change).toFixed(2)} change at ${new Date().toLocaleTimeString()}`].slice(-3));
-      }
+      setData(processedData.slice(-30));
       
-      setData(prev => [...prev, {
-        time: time++,
-        price: newPrice
-      }].slice(-30));
-    }, 1000);
+      // Analyze for significant changes
+      processedData.forEach((item, index) => {
+        if (index > 0) {
+          const change = item.price - processedData[index - 1].price;
+          if (Math.abs(change) > 3) {
+            const alertType = change > 0 ? 'spike' : 'drop';
+            setAlerts(prev => [...prev, 
+              `${alertType.toUpperCase()}: $${Math.abs(change).toFixed(2)} change at ${new Date().toLocaleTimeString()}`
+            ].slice(-3));
+          }
+        }
+      });
+    } else {
+      // Use sample data generation
+      let basePrice = 100;
+      let time = 0;
+      
+      const interval = setInterval(() => {
+        const change = (Math.random() - 0.5) * 5;
+        const newPrice = basePrice + change;
+        basePrice = newPrice;
+        
+        if (Math.abs(change) > 3) {
+          const alertType = change > 0 ? 'spike' : 'drop';
+          setAlerts(prev => [...prev, 
+            `${alertType.toUpperCase()}: $${Math.abs(change).toFixed(2)} change at ${new Date().toLocaleTimeString()}`
+          ].slice(-3));
+        }
+        
+        setData(prev => [...prev, {
+          time: time++,
+          price: newPrice
+        }].slice(-30));
+      }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+      return () => clearInterval(interval);
+    }
+  }, [userUploadedData]);
 
   return (
     <Card className="p-4">
