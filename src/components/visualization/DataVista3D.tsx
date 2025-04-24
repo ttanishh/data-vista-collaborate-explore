@@ -11,7 +11,7 @@ function DataCube({ position = [0, 0, 0], color = '#4f46e5' }) {
   return (
     <mesh
       ref={meshRef}
-      position={position}
+      position={position as [number, number, number]}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
       scale={hovered ? 1.2 : 1}
@@ -23,7 +23,7 @@ function DataCube({ position = [0, 0, 0], color = '#4f46e5' }) {
 }
 
 function FloatingGraph() {
-  // Create points properly using useMemo to avoid recreating them on every render
+  // Create points using useMemo to avoid recreation on every render
   const points = useMemo(() => {
     const pts = []
     const numPoints = 100
@@ -37,30 +37,44 @@ function FloatingGraph() {
     return pts
   }, [])
   
+  // Use useMemo to create all line geometries once
+  const lines = useMemo(() => {
+    const linesArray = []
+    
+    for (let i = 0; i < points.length; i++) {
+      if (i === points.length - 1) continue
+      
+      const point = points[i]
+      const nextPoint = points[(i + 1) % points.length]
+      
+      const linePoints = [
+        new THREE.Vector3(point[0], point[1], point[2]),
+        new THREE.Vector3(nextPoint[0], nextPoint[1], nextPoint[2])
+      ]
+      
+      const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints)
+      linesArray.push({ id: i, geometry: lineGeometry })
+    }
+    
+    return linesArray
+  }, [points])
+  
   return (
     <group>
-      {points.map((point, i) => {
-        if (i === points.length - 1) return null
-        
-        const nextPoint = points[(i + 1) % points.length]
-        const linePoints = [
-          new THREE.Vector3(point[0], point[1], point[2]),
-          new THREE.Vector3(nextPoint[0], nextPoint[1], nextPoint[2])
-        ]
-        
-        const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints)
-        
-        return (
-          <line key={i} geometry={lineGeometry}>
-            <lineBasicMaterial color="#6366f1" />
-          </line>
-        )
-      })}
+      {lines.map(line => (
+        <primitive 
+          key={line.id} 
+          object={new THREE.Line(
+            line.geometry,
+            new THREE.LineBasicMaterial({ color: '#6366f1' })
+          )} 
+        />
+      ))}
     </group>
   )
 }
 
-// Create a simple grid for reference
+// Simple grid for reference
 function Grid() {
   return (
     <gridHelper 
