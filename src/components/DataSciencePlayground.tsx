@@ -72,6 +72,86 @@ export function DataSciencePlayground({ defaultModule = 'introduction' }: DataSc
     { id: 'heatmap', name: 'Heat Map' }
   ];
 
+  // Sample datasets for downloading
+  const sampleDatasets = [
+    {
+      name: "Urban Mobility Data",
+      description: "Hourly passenger count data for urban transportation systems",
+      size: "42KB",
+      format: "JSON",
+      data: [
+        { hour: 1, line: "blue", passengers: 120 },
+        { hour: 2, line: "blue", passengers: 90 },
+        { hour: 3, line: "blue", passengers: 70 },
+        { hour: 4, line: "blue", passengers: 40 },
+        { hour: 5, line: "blue", passengers: 150 },
+        { hour: 1, line: "red", passengers: 140 },
+        { hour: 2, line: "red", passengers: 110 },
+        { hour: 3, line: "red", passengers: 80 },
+        { hour: 4, line: "red", passengers: 60 },
+        { hour: 5, line: "red", passengers: 170 }
+      ]
+    },
+    {
+      name: "Agricultural Metrics",
+      description: "Monthly rainfall, soil moisture, and temperature data",
+      size: "76KB",
+      format: "CSV",
+      data: "month,rainfall_mm,soil_moisture_pct,temperature_c\n1,120,60,15\n2,110,58,16\n3,90,55,18\n4,80,50,20\n5,60,45,24\n6,30,40,28\n7,20,35,30\n8,25,30,29\n9,40,35,26\n10,70,40,22\n11,100,50,18\n12,115,55,16"
+    },
+    {
+      name: "Customer Reviews",
+      description: "Product review text data with sentiment categories",
+      size: "128KB",
+      format: "JSON",
+      data: [
+        { id: 1, product: "Phone X", text: "Great battery life and amazing camera quality.", sentiment: "positive", rating: 5 },
+        { id: 2, product: "Laptop Pro", text: "Overpriced and battery drains too quickly.", sentiment: "negative", rating: 2 },
+        { id: 3, product: "Smart Watch", text: "Nice design but limited functionality.", sentiment: "neutral", rating: 3 },
+        { id: 4, product: "Wireless Earbuds", text: "Sound quality is excellent but uncomfortable for long use.", sentiment: "mixed", rating: 3 },
+        { id: 5, product: "Tablet Mini", text: "Perfect size and great for reading. Very satisfied!", sentiment: "positive", rating: 5 },
+        { id: 6, product: "Phone X", text: "Terrible customer service when trying to get a repair.", sentiment: "negative", rating: 1 },
+        { id: 7, product: "Laptop Pro", text: "Fast processor and beautiful display.", sentiment: "positive", rating: 4 },
+        { id: 8, product: "Smart Watch", text: "Battery life is much better than advertised.", sentiment: "positive", rating: 4 }
+      ]
+    },
+    {
+      name: "Network Graph",
+      description: "Node and edge data for social network analysis",
+      size: "95KB",
+      format: "JSON",
+      data: {
+        nodes: [
+          { id: "1", name: "Alice", group: 1 },
+          { id: "2", name: "Bob", group: 1 },
+          { id: "3", name: "Charlie", group: 2 },
+          { id: "4", name: "David", group: 2 },
+          { id: "5", name: "Eve", group: 3 },
+          { id: "6", name: "Frank", group: 3 },
+          { id: "7", name: "Grace", group: 4 },
+          { id: "8", name: "Heidi", group: 4 },
+          { id: "9", name: "Ivan", group: 5 },
+          { id: "10", name: "Judy", group: 5 }
+        ],
+        links: [
+          { source: "1", target: "2", value: 5 },
+          { source: "1", target: "3", value: 2 },
+          { source: "2", target: "3", value: 7 },
+          { source: "3", target: "4", value: 8 },
+          { source: "4", target: "5", value: 3 },
+          { source: "5", target: "6", value: 6 },
+          { source: "6", target: "7", value: 2 },
+          { source: "7", target: "8", value: 9 },
+          { source: "8", target: "9", value: 4 },
+          { source: "9", target: "10", value: 5 },
+          { source: "1", target: "5", value: 1 },
+          { source: "2", target: "6", value: 3 },
+          { source: "3", target: "7", value: 2 }
+        ]
+      }
+    }
+  ];
+
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     
@@ -208,6 +288,80 @@ export function DataSciencePlayground({ defaultModule = 'introduction' }: DataSc
     toast({
       title: "Download started",
       description: "Results have been downloaded as JSON.",
+    });
+  };
+
+  const handleDownloadSampleDataset = (index: number) => {
+    const dataset = sampleDatasets[index];
+    let dataStr: string;
+    let mimeType: string;
+    let fileExt: string;
+    
+    // Prepare the data based on format
+    if (dataset.format === "JSON") {
+      dataStr = JSON.stringify(dataset.data, null, 2);
+      mimeType = "application/json";
+      fileExt = "json";
+    } else if (dataset.format === "CSV") {
+      dataStr = dataset.data as string; // Already in CSV format
+      mimeType = "text/csv";
+      fileExt = "csv";
+    } else {
+      toast({
+        title: "Unsupported format",
+        description: "This dataset format is not supported for download.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Create and download file
+    const blob = new Blob([dataStr], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${dataset.name.toLowerCase().replace(/\s+/g, '_')}.${fileExt}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Download started",
+      description: `${dataset.name} has been downloaded as ${dataset.format}.`,
+    });
+  };
+
+  // Function to load sample dataset directly into the playground
+  const loadSampleDataset = (index: number) => {
+    const dataset = sampleDatasets[index];
+    let data;
+    
+    if (dataset.format === "JSON") {
+      data = Array.isArray(dataset.data) ? dataset.data : [dataset.data];
+    } else if (dataset.format === "CSV") {
+      // Parse CSV string
+      const csvString = dataset.data as string;
+      const lines = csvString.split("\n");
+      const headers = lines[0].split(",");
+      
+      data = lines.slice(1).filter(Boolean).map(line => {
+        const values = line.split(",");
+        const entry: Record<string, string> = {};
+        headers.forEach((header, i) => {
+          entry[header.trim()] = values[i]?.trim() || '';
+        });
+        return entry;
+      });
+    }
+    
+    setUploadedData(data);
+    setUploadedFile(null);
+    
+    toast({
+      title: "Sample data loaded",
+      description: `${dataset.name} loaded successfully into the playground.`,
     });
   };
 
