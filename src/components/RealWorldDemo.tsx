@@ -1,8 +1,10 @@
-
 import React from 'react';
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface MetricProps {
@@ -89,6 +91,14 @@ const InsightCard: React.FC<InsightCardProps> = ({ title, description, type = 'd
   );
 };
 
+interface ChartConfig {
+  type: 'line' | 'bar' | 'pie';
+  data: any[];
+  dataKey?: string;
+  valueKey?: string;
+  colors?: string[];
+}
+
 export type RealWorldDemoType = 
   | 'urbanMobility' 
   | 'agriculturalYield' 
@@ -102,6 +112,31 @@ interface RealWorldDemoProps {
 }
 
 export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
+  const { toast } = useToast();
+  const [file, setFile] = React.useState<File | null>(null);
+  const [data, setData] = React.useState<any[] | null>(null);
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setFile(file);
+    
+    toast({
+      title: "Processing data...",
+      description: "Please wait while we analyze your file.",
+    });
+
+    setTimeout(() => {
+      toast({
+        title: "Data processed successfully!",
+        description: "Your data has been analyzed and visualized.",
+      });
+      
+      setData(demoConfig[type].chart.data);
+    }, 2000);
+  };
+
   const demoConfig = {
     urbanMobility: {
       title: "Urban Mobility Analyzer",
@@ -158,7 +193,7 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
         }
       ],
       chart: {
-        type: "line",
+        type: "line" as const,
         data: [
           { hour: "5AM", passengers: 82, optimized: 82 },
           { hour: "6AM", passengers: 145, optimized: 145 },
@@ -176,7 +211,8 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
           { hour: "6PM", passengers: 251, optimized: 251 },
           { hour: "7PM", passengers: 187, optimized: 187 },
           { hour: "8PM", passengers: 98, optimized: 98 },
-        ]
+        ],
+        dataKey: "hour"
       }
     },
     agriculturalYield: {
@@ -236,7 +272,7 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
         }
       ],
       chart: {
-        type: "bar",
+        type: "bar" as const,
         data: [
           { month: "Jan", rainfall: 45, soilMoisture: 72, temperature: 52 },
           { month: "Feb", rainfall: 52, soilMoisture: 80, temperature: 58 },
@@ -244,7 +280,8 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
           { month: "Apr", rainfall: 70, soilMoisture: 85, temperature: 68 },
           { month: "May", rainfall: 35, soilMoisture: 65, temperature: 78 },
           { month: "Jun", rainfall: 25, soilMoisture: 45, temperature: 85 },
-        ]
+        ],
+        dataKey: "month"
       }
     },
     medicalResearch: {
@@ -302,7 +339,7 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
         }
       ],
       chart: {
-        type: "bar",
+        type: "bar" as const,
         data: [
           { name: "Traditional", time: 72 },
           { name: "2 Nodes", time: 38 },
@@ -368,7 +405,7 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
         }
       ],
       chart: {
-        type: "pie",
+        type: "pie" as const,
         data: [
           { name: "Positive", value: 56 },
           { name: "Neutral", value: 24 },
@@ -428,7 +465,7 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
         }
       ],
       chart: {
-        type: "line",
+        type: "line" as const,
         data: [
           { week: "W1", normal: 78, anomaly: 80 },
           { week: "W2", normal: 81, anomaly: 82 },
@@ -436,8 +473,9 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
           { week: "W4", normal: 79, anomaly: 89 },
           { week: "W5", normal: 82, anomaly: 95 },
           { week: "W6", normal: 80, anomaly: 120 },
-          { week: "W7", normal: 81, anomaly: 0 } // Failure point
-        ]
+          { week: "W7", normal: 81, anomaly: 0 }
+        ],
+        dataKey: "week"
       }
     },
     healthcareResource: {
@@ -491,7 +529,7 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
         }
       ],
       chart: {
-        type: "bar",
+        type: "bar" as const,
         data: [
           { day: "Mon", before: 87, after: 62 },
           { day: "Tue", before: 76, after: 58 },
@@ -500,7 +538,8 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
           { day: "Fri", before: 65, after: 45 },
           { day: "Sat", before: 35, after: 28 },
           { day: "Sun", before: 30, after: 25 }
-        ]
+        ],
+        dataKey: "day"
       }
     }
   };
@@ -510,12 +549,10 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
   
   return (
     <div className="relative overflow-hidden">
-      {/* Futuristic decorative elements */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-2xl -z-10"></div>
       <div className="absolute bottom-0 left-0 w-40 h-40 bg-gradient-to-tr from-data-teal/10 to-data-green/10 rounded-full blur-3xl -z-10"></div>
       
       <Card className="p-6 border border-primary/10 bg-background/70 backdrop-blur-sm relative overflow-hidden">
-        {/* Decorative lines */}
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-data-blue to-data-purple"></div>
         <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-data-purple to-data-pink"></div>
         
@@ -530,6 +567,20 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
             <p className="text-muted-foreground">
               {config.description}
             </p>
+            
+            <div className="mt-4 p-4 border-2 border-dashed rounded-lg">
+              <div className="flex flex-col items-center gap-2">
+                <Input
+                  type="file"
+                  accept=".csv,.json,.xlsx"
+                  onChange={handleFileUpload}
+                  className="max-w-xs"
+                />
+                <p className="text-sm text-muted-foreground">
+                  Upload your data file (CSV, JSON, or Excel)
+                </p>
+              </div>
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -552,12 +603,12 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
                 <ResponsiveContainer width="100%" height="100%">
                   {config.chart.type === 'line' ? (
                     <LineChart
-                      data={config.chart.data}
+                      data={data || config.chart.data}
                       margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                       <XAxis 
-                        dataKey={config.chart.dataKey || 'hour' || 'week'} 
+                        dataKey={config.chart.dataKey} 
                         tick={{ fontSize: 12 }}
                       />
                       <YAxis tick={{ fontSize: 12 }} />
@@ -611,12 +662,12 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
                     </LineChart>
                   ) : config.chart.type === 'bar' ? (
                     <BarChart
-                      data={config.chart.data}
+                      data={data || config.chart.data}
                       margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                       <XAxis 
-                        dataKey={config.chart.dataKey || 'month' || 'day' || 'name'} 
+                        dataKey={config.chart.dataKey} 
                         tick={{ fontSize: 12 }}
                       />
                       <YAxis tick={{ fontSize: 12 }} />
@@ -628,7 +679,6 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
                         }} 
                       />
                       
-                      {/* Dynamic rendering of bars based on data structure */}
                       {config.chart.data[0].hasOwnProperty('rainfall') && (
                         <>
                           <Bar dataKey="rainfall" name="Rainfall" fill="#4361EE" />
@@ -651,7 +701,7 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
                   ) : (
                     <PieChart>
                       <Pie
-                        data={config.chart.data}
+                        data={data || config.chart.data}
                         dataKey="value"
                         nameKey="name"
                         cx="50%"
@@ -660,8 +710,11 @@ export const RealWorldDemo: React.FC<RealWorldDemoProps> = ({ type }) => {
                         fill="#8884d8"
                         label={(entry) => entry.name}
                       >
-                        {config.chart.data.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={config.chart.colors[index % config.chart.colors.length]} />
+                        {(data || config.chart.data).map((entry: any, index: number) => (
+                          <Cell 
+                            key={`cell-${index}`} 
+                            fill={config.chart.colors?.[index % (config.chart.colors?.length || 1)]}
+                          />
                         ))}
                       </Pie>
                       <Tooltip 
