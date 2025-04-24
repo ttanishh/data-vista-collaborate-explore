@@ -1,8 +1,8 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
+import { DataVista3D } from "@/components/visualization/DataVista3D";
 
 // Module data
 const modules = [
@@ -79,10 +79,8 @@ export default function Index() {
               </Link>
             </div>
             
-            <div className="w-full max-w-5xl h-72 bg-gradient-to-br from-data-blue/10 via-data-purple/10 to-data-pink/10 rounded-xl border border-border flex items-center justify-center">
-              <div className="text-2xl font-medium text-muted-foreground">
-                3D Visualization Preview
-              </div>
+            <div className="w-full max-w-5xl h-[500px] bg-gradient-to-br from-data-blue/5 via-data-purple/5 to-data-pink/5 rounded-xl border border-border">
+              <DataVista3D />
             </div>
           </div>
         </div>
