@@ -1,8 +1,9 @@
+
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
-import { DataVista3D } from "@/components/visualization/DataVista3D";
+import OlapOperations from "@/components/visualization/OlapOperations";
 
 // Module data
 const modules = [
@@ -79,8 +80,8 @@ export default function Index() {
               </Link>
             </div>
             
-            <div className="w-full max-w-5xl h-[500px] bg-gradient-to-br from-data-blue/5 via-data-purple/5 to-data-pink/5 rounded-xl border border-border">
-              <DataVista3D />
+            <div className="w-full max-w-5xl rounded-xl border border-border">
+              <OlapOperations />
             </div>
           </div>
         </div>
@@ -121,9 +122,9 @@ export default function Index() {
                     <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold">3D WebGL Visualizations</h3>
+                <h3 className="text-xl font-bold">OLAP Operations</h3>
                 <p className="text-muted-foreground">
-                  Interactive 3D representations of complex datasets with animation transitions.
+                  Interactive data exploration with Roll-up, Drill-down, Slice, Dice, and Pivot operations.
                 </p>
               </div>
             </Card>
