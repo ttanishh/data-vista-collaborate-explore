@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -57,7 +56,6 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {/* TooltipProvider needs to be inside the React component, not outside */}
       <BrowserRouter>
         <TooltipProvider>
           <Toaster />
@@ -249,7 +247,6 @@ const App = () => {
             <Route path="/modules/data-streams" element={<DataStreams />} />
             <Route path="/modules/advanced-analysis" element={<AdvancedAnalysis />} />
             <Route path="/data-science-playground" element={<DataSciencePlayground />} />
-            <Route path="/collaborate" element={<Collaborate />} />
             <Route path="/about" element={<About />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
