@@ -135,6 +135,17 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
     );
   };
 
+  // Handle the module name transformation to match chartConfigs keys
+  const getModuleKey = (moduleName: string) => {
+    // Convert to lowercase and remove spaces
+    const key = moduleName.toLowerCase().replace(/\s+/g, '');
+    // Return the key if it exists, otherwise default to urbanMobility
+    return chartConfigs[key] ? key : 'urbanMobility';
+  };
+
+  const moduleKey = getModuleKey(module);
+  const config = chartConfigs[moduleKey];
+
   return (
     <div className="space-y-8">
       <Card className="p-6">
@@ -143,12 +154,12 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
             {module} Application Demo
           </h3>
           <div className="mt-4">
-            {renderChart(chartConfigs[module.toLowerCase().replace(/\s+/g, '')])}
+            {config && renderChart(config)}
           </div>
         </div>
       </Card>
       <PlaygroundTechnicalPanel 
-        module={module.toLowerCase().replace(/\s+/g, '') as any}
+        module={moduleKey as any}
       />
     </div>
   );

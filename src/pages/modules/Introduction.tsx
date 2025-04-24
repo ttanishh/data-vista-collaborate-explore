@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
@@ -639,4 +640,424 @@ export default function Introduction() {
                             </li>
                             <li className="flex items-start gap-2">
                               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
-                                <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 
+                                <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
+                                <path d="m6.08 9.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                                <path d="m6.08 14.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                              </svg>
+                              <span>Integration across online and physical retail environments</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
+                                <path d="m6.08 9.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                                <path d="m6.08 14.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                              </svg>
+                              <span>Balancing personalization with customer privacy concerns</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
+                                <path d="m6.08 9.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                                <path d="m6.08 14.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                              </svg>
+                              <span>Real-time inventory tracking across distributed supply chains</span>
+                            </li>
+                          </ul>
+                        )}
+
+                        {selectedDomain === "transportation" && (
+                          <ul className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
+                                <path d="m6.08 9.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                                <path d="m6.08 14.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                              </svg>
+                              <span>Real-time routing with rapidly changing conditions (traffic, weather)</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
+                                <path d="m6.08 9.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                                <path d="m6.08 14.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                              </svg>
+                              <span>Safety-critical applications with zero tolerance for failure</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
+                                <path d="m6.08 9.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                                <path d="m6.08 14.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                              </svg>
+                              <span>Balancing efficiency with environmental sustainability goals</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/>
+                                <path d="m6.08 9.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                                <path d="m6.08 14.5-3.5 1.6a1 1 0 0 0 0 1.81l8.58 3.9a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.81l-3.5-1.6"/>
+                              </svg>
+                              <span>Integration with legacy transportation infrastructure systems</span>
+                            </li>
+                          </ul>
+                        )}
+                      </TabsContent>
+                      
+                      <TabsContent value="techniques" className="space-y-4">
+                        {selectedDomain === "healthcare" && (
+                          <ul className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Deep learning for medical image analysis and diagnostics</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Natural language processing for clinical notes and medical literature</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Survival analysis for patient outcome prediction</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Privacy-preserving machine learning with federated learning</span>
+                            </li>
+                          </ul>
+                        )}
+                        
+                        {selectedDomain === "finance" && (
+                          <ul className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Time series forecasting for market predictions</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Anomaly detection for fraud identification</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Reinforcement learning for algorithmic trading strategies</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Natural language processing for sentiment analysis of financial news</span>
+                            </li>
+                          </ul>
+                        )}
+                        
+                        {selectedDomain === "retail" && (
+                          <ul className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Association rule mining for market basket analysis</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Collaborative filtering for personalized recommendations</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Forecasting algorithms for demand prediction and inventory management</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Computer vision for in-store customer behavior analysis</span>
+                            </li>
+                          </ul>
+                        )}
+
+                        {selectedDomain === "transportation" && (
+                          <ul className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Graph theory for route optimization and network analysis</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Time series analysis for predictive maintenance</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Spatial analysis and GIS integration for location-based services</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+                                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+                                <path d="M4 22h16" />
+                                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22" />
+                                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22" />
+                                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z" />
+                              </svg>
+                              <span>Computer vision for autonomous vehicle navigation and safety systems</span>
+                            </li>
+                          </ul>
+                        )}
+                      </TabsContent>
+                      
+                      <TabsContent value="outcomes" className="space-y-4">
+                        {selectedDomain === "healthcare" && (
+                          <ul className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Improved diagnostic accuracy with faster detection of diseases</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Personalized treatment plans based on patient-specific factors</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Optimized hospital operations with reduced wait times and costs</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Early prediction of disease outbreaks and public health trends</span>
+                            </li>
+                          </ul>
+                        )}
+                        
+                        {selectedDomain === "finance" && (
+                          <ul className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Reduction in fraudulent transactions and associated losses</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>More accurate risk assessment for loans and investments</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Improved trading strategies with higher returns and lower risk</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Personalized financial services with higher customer satisfaction</span>
+                            </li>
+                          </ul>
+                        )}
+                        
+                        {selectedDomain === "retail" && (
+                          <ul className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Increased sales through personalized recommendation systems</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Optimized inventory levels with reduced costs and stockouts</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Enhanced customer loyalty through personalized experiences</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>More effective marketing campaigns with higher ROI</span>
+                            </li>
+                          </ul>
+                        )}
+
+                        {selectedDomain === "transportation" && (
+                          <ul className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Reduced travel times through optimized routing and traffic management</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Lower maintenance costs with predictive maintenance systems</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Improved safety with accident prediction and prevention systems</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary mt-1">
+                                <path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" />
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                                <line x1="12" x2="12.01" y1="17" y2="17" />
+                              </svg>
+                              <span>Reduced environmental impact through fuel efficiency optimization</span>
+                            </li>
+                          </ul>
+                        )}
+                      </TabsContent>
+                    </Tabs>
+                  </div>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+    </Layout>
+  );
+}
