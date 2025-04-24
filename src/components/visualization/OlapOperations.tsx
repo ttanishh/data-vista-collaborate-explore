@@ -21,6 +21,7 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { OlapCube3D } from "@/components/visualization/OlapCube3D";
 
 // Sample dataset
 const initialData = [
