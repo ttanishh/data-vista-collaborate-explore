@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +11,7 @@ import DataManipulation from "./pages/modules/DataManipulation";
 import TextAnalysis from "./pages/modules/TextAnalysis";
 import DataStreams from "./pages/modules/DataStreams";
 import AdvancedAnalysis from "./pages/modules/AdvancedAnalysis";
+import DataSciencePlayground from "./pages/DataSciencePlayground";
 import Collaborate from "./pages/Collaborate";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
@@ -28,7 +28,6 @@ const App = () => {
   const [showDashboard, setShowDashboard] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
   
-  // Detect current module based on URL path
   useEffect(() => {
     const path = window.location.pathname;
     if (path.includes('introduction')) setCurrentModule('introduction');
@@ -39,7 +38,6 @@ const App = () => {
     else if (path.includes('advanced-analysis')) setCurrentModule('advancedAnalysis');
   }, []);
   
-  // Hide splash screen after 2.5 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowSplash(false);
@@ -47,7 +45,6 @@ const App = () => {
     return () => clearTimeout(timer);
   }, []);
   
-  // Dashboard metrics
   const dashboardMetrics = {
     datasets: 6,
     algorithms: 12,
@@ -63,7 +60,6 @@ const App = () => {
         <Toaster />
         <Sonner />
         
-        {/* Modern splash screen */}
         <AnimatePresence>
           {showSplash && (
             <motion.div 
@@ -101,9 +97,7 @@ const App = () => {
           )}
         </AnimatePresence>
         
-        {/* Floating action buttons */}
         <div className="fixed right-4 bottom-4 flex flex-col items-end space-y-2 z-40">
-          {/* Technical Panel Button */}
           <Button
             variant="outline"
             size="sm"
@@ -123,7 +117,6 @@ const App = () => {
             </svg>
           </Button>
           
-          {/* Dashboard Button */}
           <Button
             variant="outline"
             size="sm"
@@ -139,7 +132,6 @@ const App = () => {
           </Button>
         </div>
         
-        {/* Technical Panel */}
         <AnimatePresence>
           {showTechnicalPanel && (
             <motion.div 
@@ -154,7 +146,6 @@ const App = () => {
           )}
         </AnimatePresence>
         
-        {/* Dashboard Modal */}
         <AnimatePresence>
           {showDashboard && (
             <motion.div 
@@ -255,9 +246,9 @@ const App = () => {
             <Route path="/modules/text-analysis" element={<TextAnalysis />} />
             <Route path="/modules/data-streams" element={<DataStreams />} />
             <Route path="/modules/advanced-analysis" element={<AdvancedAnalysis />} />
+            <Route path="/data-science-playground" element={<DataSciencePlayground />} />
             <Route path="/collaborate" element={<Collaborate />} />
             <Route path="/about" element={<About />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

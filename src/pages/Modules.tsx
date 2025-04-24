@@ -2,6 +2,8 @@
 import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { FileInput } from "lucide-react";
 
 // Module data
 const modules = [
@@ -97,6 +99,14 @@ export default function Modules() {
             <p className="text-xl text-muted-foreground">
               Explore our six interactive modules demonstrating practical applications of advanced data science concepts.
             </p>
+            <div className="pt-4">
+              <Link to="/data-science-playground">
+                <Button className="bg-gradient-to-r from-data-blue to-data-purple text-white">
+                  <FileInput className="mr-2 h-4 w-4" />
+                  Try the Data Science Playground
+                </Button>
+              </Link>
+            </div>
           </div>
           
           <div className="space-y-12">
