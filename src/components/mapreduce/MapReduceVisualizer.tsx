@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -13,6 +12,7 @@ import {
   Tooltip,
   ResponsiveContainer
 } from 'recharts';
+import { ClusterHeatmap } from './ClusterHeatmap';
 
 interface DataPoint {
   key: string;
@@ -28,9 +28,16 @@ interface MapReduceVisualizerProps {
     shuffle: number;
     reduce: number;
   };
+  nodeCount?: number;
 }
 
-export const MapReduceVisualizer = ({ data, phase, operation, progress }: MapReduceVisualizerProps) => {
+export const MapReduceVisualizer = ({ 
+  data, 
+  phase, 
+  operation, 
+  progress,
+  nodeCount = 10 
+}: MapReduceVisualizerProps) => {
   const [mappedData, setMappedData] = useState<DataPoint[]>([]);
   const [reducedData, setReducedData] = useState<DataPoint[]>([]);
   const { toast } = useToast();
@@ -137,6 +144,8 @@ export const MapReduceVisualizer = ({ data, phase, operation, progress }: MapRed
           </div>
         </Card>
       </div>
+
+      <ClusterHeatmap nodeCount={nodeCount} phase={phase} />
 
       <div className="border rounded-lg p-4">
         <div className="h-[300px]">
