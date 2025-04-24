@@ -1,34 +1,25 @@
+
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Slider } from "@/components/ui/slider";
-import { Switch } from "@/components/ui/switch";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer
-} from "recharts";
+import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/components/ui/use-toast";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 export default function DataStreams() {
+  const { toast } = useToast();
+  
+  const [streamType, setStreamType] = useState<"social" | "iot" | "transactions">("social");
   const [streamActive, setStreamActive] = useState(false);
-  const [streamSpeed, setStreamSpeed] = useState(1);
-  const [streamType, setStreamType] = useState("social");
-  const [algorithmType, setAlgorithmType] = useState("distinct-counting");
-  const [windowSize, setWindowSize] = useState(20);
+  const [streamSpeed, setStreamSpeed] = useState(50);
+  const [windowSize, setWindowSize] = useState(10);
+  const [reservoirSize, setReservoirSize] = useState(5);
+  const [reservoir, setReservoir] = useState<any[]>([]);
   const [dataPoints, setDataPoints] = useState<any[]>([]);
   const [anomalies, setAnomalies] = useState<number[]>([]);
 
@@ -71,24 +62,48 @@ export default function DataStreams() {
           }
         }
         
+        // Update reservoir sample
+        if (newPoints.length <= reservoirSize) {
+          setReservoir(newPoints);
+        } else {
+          const j = Math.floor(Math.random() * newPoints.length);
+          if (j < reservoirSize) {
+            setReservoir(prev => {
+              const newReservoir = [...prev];
+              newReservoir[j] = newPoint;
+              return newReservoir;
+            });
+          }
+        }
+        
         return newPoints;
       });
-    }, 1000 / streamSpeed);
+    }, 1000 - (streamSpeed * 9));
     
     return () => clearInterval(interval);
-  }, [streamActive, streamSpeed, streamType, windowSize]);
-
-  const handleStartStream = () => {
-    setStreamActive(true);
-  };
-
-  const handleStopStream = () => {
-    setStreamActive(false);
-  };
-
-  const handleClearData = () => {
+  }, [streamActive, streamType, streamSpeed, windowSize, reservoirSize]);
+  
+  const startStream = () => {
+    if (streamActive) return;
+    
     setDataPoints([]);
+    setReservoir([]);
     setAnomalies([]);
+    setStreamActive(true);
+    
+    toast({
+      title: "Stream Started",
+      description: `Monitoring ${streamType} data stream in real-time.`,
+    });
+  };
+  
+  const stopStream = () => {
+    setStreamActive(false);
+    
+    toast({
+      title: "Stream Paused",
+      description: "Data stream monitoring has been paused.",
+    });
   };
 
   return (
@@ -111,391 +126,580 @@ export default function DataStreams() {
             <Card className="p-6">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <h2 className="text-2xl font-bold">Stream Configuration</h2>
+                  <h2 className="text-2xl font-bold">Data Stream Simulator</h2>
                   <p className="text-muted-foreground">
-                    Configure your data stream source and parameters
+                    Configure and visualize different types of data streams in real-time
                   </p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Stream Type</Label>
-                      <Select value={streamType} onValueChange={setStreamType} disabled={streamActive}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select stream type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="social">Social Media Activity</SelectItem>
-                          <SelectItem value="iot">IoT Sensor Data</SelectItem>
-                          <SelectItem value="transactions">Financial Transactions</SelectItem>
-                        </SelectContent>
-                      </Select>
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <h3 className="font-medium">Stream Configuration</h3>
+                      
+                      <div className="space-y-4">
+                        <div>
+                          <h4 className="text-sm font-medium mb-3">Stream Type</h4>
+                          <RadioGroup 
+                            defaultValue="social" 
+                            value={streamType}
+                            onValueChange={(value) => setStreamType(value as "social" | "iot" | "transactions")}
+                            className="grid grid-cols-3 gap-4"
+                          >
+                            <div>
+                              <RadioGroupItem 
+                                value="social" 
+                                id="social" 
+                                className="peer sr-only" 
+                                disabled={streamActive}
+                              />
+                              <Label
+                                htmlFor="social"
+                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="mb-2"
+                                >
+                                  <path d="M21 12a9 9 0 0 0-9-9 9 9 0 0 0-9 9c0 4.97 4.03 9 9 9 4.97 0 9-4.03 9-9Z"/>
+                                  <path d="M8 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+                                  <path d="M12 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+                                  <path d="M16 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+                                </svg>
+                                <span className="text-sm font-medium">Social Media</span>
+                              </Label>
+                            </div>
+                            
+                            <div>
+                              <RadioGroupItem 
+                                value="iot" 
+                                id="iot" 
+                                className="peer sr-only" 
+                                disabled={streamActive}
+                              />
+                              <Label
+                                htmlFor="iot"
+                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="mb-2"
+                                >
+                                  <rect width="8" height="8" x="8" y="8" rx="2" />
+                                  <path d="M4 10a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2" />
+                                  <path d="M14 20a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2" />
+                                  <path d="M4 20a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2" />
+                                  <path d="M14 4a2 2 0 0 0-2-2H8" />
+                                </svg>
+                                <span className="text-sm font-medium">IoT Sensors</span>
+                              </Label>
+                            </div>
+                            
+                            <div>
+                              <RadioGroupItem 
+                                value="transactions" 
+                                id="transactions" 
+                                className="peer sr-only" 
+                                disabled={streamActive}
+                              />
+                              <Label
+                                htmlFor="transactions"
+                                className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  className="mb-2"
+                                >
+                                  <rect width="20" height="14" x="2" y="5" rx="2" />
+                                  <line x1="2" x2="22" y1="10" y2="10" />
+                                </svg>
+                                <span className="text-sm font-medium">Transactions</span>
+                              </Label>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <Label>Stream Velocity</Label>
+                            <span className="text-sm text-muted-foreground">{streamSpeed}%</span>
+                          </div>
+                          <Slider 
+                            value={[streamSpeed]} 
+                            min={1} 
+                            max={100} 
+                            step={1} 
+                            onValueChange={(value) => setStreamSpeed(value[0])}
+                            disabled={streamActive}
+                            className="w-full"
+                          />
+                          <div className="flex justify-between text-xs text-muted-foreground">
+                            <span>Slower</span>
+                            <span>Faster</span>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <Label>Sliding Window Size</Label>
+                            <span className="text-sm text-muted-foreground">{windowSize} points</span>
+                          </div>
+                          <Slider 
+                            value={[windowSize]} 
+                            min={5} 
+                            max={50} 
+                            step={5} 
+                            onValueChange={(value) => setWindowSize(value[0])}
+                            disabled={streamActive}
+                            className="w-full"
+                          />
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <Label>Reservoir Size</Label>
+                            <span className="text-sm text-muted-foreground">{reservoirSize} samples</span>
+                          </div>
+                          <Slider 
+                            value={[reservoirSize]} 
+                            min={1} 
+                            max={20} 
+                            step={1} 
+                            onValueChange={(value) => setReservoirSize(value[0])}
+                            disabled={streamActive}
+                            className="w-full"
+                          />
+                        </div>
+                      </div>
                     </div>
                     
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <Label>Stream Velocity</Label>
-                        <span className="text-sm text-muted-foreground">{streamSpeed}x</span>
-                      </div>
-                      <Slider 
-                        min={0.5} 
-                        max={5} 
-                        step={0.5} 
-                        value={[streamSpeed]} 
-                        onValueChange={(value) => setStreamSpeed(value[0])}
-                        disabled={streamActive}
-                      />
+                    <div className="flex gap-4">
+                      {!streamActive ? (
+                        <Button onClick={startStream} className="flex-1">
+                          Start Stream
+                        </Button>
+                      ) : (
+                        <Button onClick={stopStream} variant="outline" className="flex-1">
+                          Pause Stream
+                        </Button>
+                      )}
+                      <Button 
+                        variant="outline" 
+                        onClick={() => {
+                          stopStream();
+                          setDataPoints([]);
+                          setAnomalies([]);
+                          setReservoir([]);
+                        }}
+                        className="flex-1"
+                      >
+                        Clear Data
+                      </Button>
                     </div>
                   </div>
                   
                   <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label>Algorithm Type</Label>
-                      <Select value={algorithmType} onValueChange={setAlgorithmType}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select algorithm type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="distinct-counting">Distinct Element Counting</SelectItem>
-                          <SelectItem value="reservoir-sampling">Reservoir Sampling</SelectItem>
-                          <SelectItem value="sliding-window">Sliding Window Analysis</SelectItem>
-                        </SelectContent>
-                      </Select>
+                    <h3 className="font-medium">Stream Visualization</h3>
+                    <div className="border rounded-lg p-4 h-64">
+                      {dataPoints.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <LineChart
+                            data={dataPoints}
+                            margin={{
+                              top: 5,
+                              right: 30,
+                              left: 20,
+                              bottom: 5,
+                            }}
+                          >
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <XAxis 
+                              dataKey="timestamp" 
+                              tick={{ fontSize: 12 }} 
+                              tickFormatter={(value) => {
+                                return value.split(':').slice(0, 2).join(':');
+                              }}
+                            />
+                            <YAxis />
+                            <Tooltip />
+                            <Line
+                              type="monotone"
+                              dataKey="value"
+                              stroke="#8884d8" 
+                              activeDot={{ r: 8 }}
+                              dot={(props: any) => {
+                                const isAnomaly = anomalies.includes(props.index);
+                                if (isAnomaly) {
+                                  return (
+                                    <svg x={props.cx - 5} y={props.cy - 5} width="10" height="10" fill="red">
+                                      <circle r="4" cx="5" cy="5" />
+                                    </svg>
+                                  );
+                                }
+                                return null;
+                              }}
+                            />
+                          </LineChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="h-full flex flex-col items-center justify-center text-muted-foreground">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="24"
+                            height="24"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="mb-2"
+                          >
+                            <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0Z"/>
+                            <path d="M12 8v4l2 2"/>
+                          </svg>
+                          <span>Waiting for stream data...</span>
+                        </div>
+                      )}
                     </div>
                     
                     <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <Label>Window Size</Label>
-                        <span className="text-sm text-muted-foreground">{windowSize} elements</span>
+                      <h4 className="text-sm font-medium">Anomaly Detection</h4>
+                      <p className="text-sm text-muted-foreground">
+                        Red points indicate anomalies detected in the stream (values more than 2 standard deviations from the mean).
+                      </p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <span className="text-sm">Anomalies detected: {anomalies.length}</span>
                       </div>
-                      <Slider 
-                        min={5} 
-                        max={50} 
-                        step={5} 
-                        value={[windowSize]} 
-                        onValueChange={(value) => setWindowSize(value[0])}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center space-x-4">
-                      <Switch id="anomaly-detection" checked={true} />
-                      <Label htmlFor="anomaly-detection">Enable Anomaly Detection</Label>
                     </div>
                   </div>
                 </div>
-                
-                <div className="flex flex-wrap gap-4 justify-center">
-                  {!streamActive ? (
-                    <Button onClick={handleStartStream}>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-2"
-                      >
-                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                      </svg>
-                      Start Stream
-                    </Button>
-                  ) : (
-                    <Button onClick={handleStopStream} variant="secondary">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-2"
-                      >
-                        <rect x="6" y="4" width="4" height="16"></rect>
-                        <rect x="14" y="4" width="4" height="16"></rect>
-                      </svg>
-                      Stop Stream
-                    </Button>
-                  )}
-                  <Button variant="outline" onClick={handleClearData}>
-                    Clear Data
-                  </Button>
-                </div>
               </div>
             </Card>
             
-            <Card className="p-6">
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <h2 className="text-2xl font-bold">Stream Visualization</h2>
-                  <p className="text-muted-foreground">
-                    Real-time data stream with automated analytics
-                  </p>
-                </div>
-                
-                <div className="h-80 border rounded-lg p-4">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart
-                      data={dataPoints}
-                      margin={{
-                        top: 5,
-                        right: 30,
-                        left: 20,
-                        bottom: 5,
-                      }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis 
-                        dataKey="timestamp" 
-                        tick={{ fontSize: 12 }} 
-                        tickFormatter={(value) => {
-                          return value.split(':').slice(0, 2).join(':');
-                        }}
-                      />
-                      <YAxis />
-                      <Tooltip />
-                      <Line 
-                        type="monotone" 
-                        dataKey="value" 
-                        stroke="#8884d8" 
-                        activeDot={{ r: 8 }}
-                        dot={(props: any) => {
-                          const isAnomaly = anomalies.includes(props.index);
-                          if (isAnomaly) {
-                            return (
-                              <svg x={props.cx - 6} y={props.cy - 6} width="12" height="12" fill="red">
-                                <circle r={6} cx={6} cy={6} />
-                              </svg>
-                            );
-                          }
-                          return null;
-                        }}
-                      />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </Card>
-            
-            <Tabs defaultValue="algorithm" className="w-full">
+            <Tabs defaultValue="reservoir" className="w-full">
               <TabsList className="grid grid-cols-3 mb-8">
-                <TabsTrigger value="algorithm">Algorithm Details</TabsTrigger>
-                <TabsTrigger value="metrics">Performance Metrics</TabsTrigger>
-                <TabsTrigger value="analytics">Stream Analytics</TabsTrigger>
+                <TabsTrigger value="reservoir">Reservoir Sampling</TabsTrigger>
+                <TabsTrigger value="counting">Distinct Counting</TabsTrigger>
+                <TabsTrigger value="window">Window Analysis</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="algorithm" className="space-y-4">
+              <TabsContent value="reservoir" className="space-y-4">
                 <Card className="p-6">
                   <div className="space-y-6">
-                    <h3 className="text-xl font-bold">
-                      {algorithmType === "distinct-counting" ? "Distinct Element Counting" : 
-                       algorithmType === "reservoir-sampling" ? "Reservoir Sampling" : 
-                       "Sliding Window Analysis"}
-                    </h3>
-                    
-                    {algorithmType === "distinct-counting" && (
-                      <div className="space-y-4">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1">
+                        <h2 className="text-2xl font-bold">Reservoir Sampling</h2>
                         <p className="text-muted-foreground">
-                          Distinct element counting algorithms estimate the number of unique elements in a data stream without storing all elements. The Flajolet-Martin algorithm uses a probabilistic approach with hash functions to estimate cardinality.
+                          Randomly select k items from a stream of unknown length
                         </p>
-                        
-                        <div className="bg-secondary/10 p-4 rounded-lg">
-                          <h4 className="font-medium mb-3">Flajolet-Martin Algorithm</h4>
-                          <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-2">
-                            <li>Hash each element of the stream to a uniformly distributed value.</li>
-                            <li>Count the maximum number of trailing zeros in the binary representation of any hash value.</li>
-                            <li>The estimate of distinct elements is approximately 2^r where r is the maximum number of trailing zeros.</li>
-                            <li>For better accuracy, multiple hash functions can be used and their results averaged.</li>
-                          </ol>
-                        </div>
                       </div>
-                    )}
+                      
+                      <div className="text-right">
+                        <div className="text-3xl font-bold">{reservoir.length}</div>
+                        <div className="text-sm text-muted-foreground">samples</div>
+                      </div>
+                    </div>
                     
-                    {algorithmType === "reservoir-sampling" && (
-                      <div className="space-y-4">
-                        <p className="text-muted-foreground">
-                          Reservoir sampling maintains a representative sample of k elements from a stream of unknown size. It ensures that each element in the stream has an equal probability of being included in the final sample.
-                        </p>
-                        
-                        <div className="bg-secondary/10 p-4 rounded-lg">
-                          <h4 className="font-medium mb-3">Algorithm Steps</h4>
-                          <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-2">
-                            <li>Store the first k elements of the stream in the reservoir.</li>
-                            <li>For each subsequent element at position i (where i {'>'}  k):
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                      {reservoir.map((item, index) => (
+                        <Card key={index} className="p-3">
+                          <div className="font-mono text-xl text-center mb-1">{item.value}</div>
+                          <div className="text-xs text-center text-muted-foreground">{item.timestamp}</div>
+                        </Card>
+                      ))}
+                      {Array.from({ length: Math.max(0, reservoirSize - reservoir.length) }).map((_, index) => (
+                        <Card key={`empty-${index}`} className="p-3 border-dashed flex items-center justify-center">
+                          <div className="text-muted-foreground text-sm">Empty</div>
+                        </Card>
+                      ))}
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="p-4 border rounded-lg bg-secondary/10">
+                        <h3 className="font-medium mb-3">How Reservoir Sampling Works</h3>
+                        <ul className="space-y-2 text-sm text-muted-foreground">
+                          <li className="flex items-start gap-2">
+                            <div className="rounded-full bg-primary h-5 w-5 flex items-center justify-center text-xs text-primary-foreground flex-shrink-0 mt-0.5">1</div>
+                            <span>Store the first k elements of the stream in the reservoir.</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="rounded-full bg-primary h-5 w-5 flex items-center justify-center text-xs text-primary-foreground flex-shrink-0 mt-0.5">2</div>
+                            <span>For each subsequent element at position i (where i {'>'} k):
                               <ol className="list-disc list-inside ml-6 mt-2 space-y-1">
                                 <li>Generate a random number j between 1 and i.</li>
                                 <li>If j ≤ k, replace the j-th element in the reservoir with the new element.</li>
                               </ol>
+                            </span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <div className="rounded-full bg-primary h-5 w-5 flex items-center justify-center text-xs text-primary-foreground flex-shrink-0 mt-0.5">3</div>
+                            <span>Each element has a k/n probability of being in the final sample, where n is the stream length.</span>
+                          </li>
+                        </ul>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="p-4 border rounded-lg">
+                          <h4 className="font-medium mb-2">Key Benefits</h4>
+                          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                            <li>Works with streams of unknown or infinite length</li>
+                            <li>Maintains a uniform random sample</li>
+                            <li>Uses constant memory (O(k))</li>
+                            <li>Single-pass algorithm (no need to revisit data)</li>
+                          </ul>
+                        </div>
+                        
+                        <div className="p-4 border rounded-lg">
+                          <h4 className="font-medium mb-2">Applications</h4>
+                          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                            <li>Social media trend analysis from sample posts</li>
+                            <li>Network traffic monitoring</li>
+                            <li>Sensor data analysis</li>
+                            <li>A/B testing with limited storage</li>
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="counting" className="space-y-4">
+                <Card className="p-6">
+                  <div className="space-y-6">
+                    <div className="space-y-1">
+                      <h2 className="text-2xl font-bold">Distinct Counting Algorithms</h2>
+                      <p className="text-muted-foreground">
+                        Estimate the number of distinct elements in a data stream
+                      </p>
+                    </div>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-4">
+                        <h3 className="font-medium">Flajolet-Martin Algorithm</h3>
+                        <div className="p-4 border rounded-lg">
+                          <div className="flex justify-between items-center mb-4">
+                            <div>
+                              <div className="text-sm text-muted-foreground">Estimated Distinct Elements</div>
+                              <div className="text-3xl font-bold">{Math.floor(dataPoints.length * 0.8)}</div>
+                            </div>
+                            <div className="text-muted-foreground">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="36"
+                                height="36"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <rect width="18" height="18" x="3" y="3" rx="2" />
+                                <path d="M13 17V7h4" />
+                                <path d="M13 11h4" />
+                                <path d="M8 11.846v.308A.846.846 0 0 0 8.846 13h.308a.846.846 0 0 0 .846-.846v-.308A.846.846 0 0 0 9.154 11h-.308a.846.846 0 0 0-.846.846Z" />
+                                <path d="M8.5 7h-1a2 2 0 0 0-2 2v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a2 2 0 0 0 2 2h1" />
+                              </svg>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-medium">Error Estimate</h4>
+                            <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                              <div 
+                                className={`bg-primary h-full rounded-full`}
+                                style={{ width: "15%" }}
+                              ></div>
+                            </div>
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                              <span>±15% error margin</span>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="p-4 border rounded-lg bg-secondary/10">
+                          <h4 className="font-medium mb-3">Algorithm Mechanism</h4>
+                          <ol className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <div className="rounded-full bg-secondary h-5 w-5 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">1</div>
+                              <span>Hash each element to a binary value</span>
                             </li>
-                            <li>After processing the entire stream, the reservoir contains a random sample of k elements.</li>
+                            <li className="flex items-start gap-2">
+                              <div className="rounded-full bg-secondary h-5 w-5 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">2</div>
+                              <span>Record the position of the rightmost '1' bit (R)</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <div className="rounded-full bg-secondary h-5 w-5 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">3</div>
+                              <span>Track the maximum R value observed</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <div className="rounded-full bg-secondary h-5 w-5 flex items-center justify-center text-xs flex-shrink-0 mt-0.5">4</div>
+                              <span>Estimate count as 2^R * constant factor</span>
+                            </li>
                           </ol>
                         </div>
                       </div>
-                    )}
-                    
-                    {algorithmType === "sliding-window" && (
-                      <div className="space-y-4">
-                        <p className="text-muted-foreground">
-                          Sliding window analysis focuses on the most recent n elements of the stream. This approach is particularly useful for detecting trends, patterns, or anomalies in time-sensitive data.
-                        </p>
-                        
-                        <div className="bg-secondary/10 p-4 rounded-lg">
-                          <h4 className="font-medium mb-3">Implementation Approaches</h4>
-                          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-2">
-                            <li><span className="font-medium">Fixed-Size Window:</span> Maintains exactly n elements at all times, removing the oldest element when a new one arrives.</li>
-                            <li><span className="font-medium">Time-Based Window:</span> Keeps elements that arrived within the last t time units.</li>
-                            <li><span className="font-medium">Landmark Window:</span> Considers all elements from a specific time point to the present.</li>
-                            <li><span className="font-medium">Exponential Histogram:</span> Maintains buckets of exponentially increasing sizes to approximate sliding window statistics with reduced memory.</li>
-                          </ul>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-medium mb-3">Applications</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <h5 className="text-sm font-medium mb-2">Use Cases</h5>
-                          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                            <li>Real-time fraud detection</li>
-                            <li>Network traffic monitoring</li>
-                            <li>Social media trend analysis</li>
-                            <li>IoT sensor data processing</li>
-                            <li>Financial market analysis</li>
-                          </ul>
-                        </div>
-                        <div>
-                          <h5 className="text-sm font-medium mb-2">Advantages</h5>
-                          <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                            <li>Constant memory usage</li>
-                            <li>Single-pass processing</li>
-                            <li>Real-time results</li>
-                            <li>Handles infinite streams</li>
-                            <li>Adaptable to concept drift</li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              </TabsContent>
-              
-              <TabsContent value="metrics" className="space-y-4">
-                <Card className="p-6">
-                  <div className="space-y-6">
-                    <h3 className="text-xl font-bold">Performance Metrics</h3>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <div className="p-4 border rounded-lg">
-                          <h4 className="font-medium mb-3">Time Complexity</h4>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-sm">Processing Speed</span>
-                              <span className="text-sm font-medium">{streamActive ? (streamSpeed * 10).toFixed(1) : 0} elements/sec</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm">Processing Latency</span>
-                              <span className="text-sm font-medium">{streamActive ? (100 / streamSpeed).toFixed(1) : 0} ms</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm">Algorithm Complexity</span>
-                              <span className="text-sm font-medium">
-                                {algorithmType === "distinct-counting" ? "O(1) per element" : 
-                                 algorithmType === "reservoir-sampling" ? "O(1) per element" : 
-                                 "O(window size)"}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="p-4 border rounded-lg">
-                          <h4 className="font-medium mb-3">Space Complexity</h4>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-sm">Memory Usage</span>
-                              <span className="text-sm font-medium">
-                                {algorithmType === "distinct-counting" ? "O(log n)" : 
-                                 algorithmType === "reservoir-sampling" ? `O(${windowSize})` : 
-                                 `O(${windowSize})`}
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm">State Size</span>
-                              <span className="text-sm font-medium">{dataPoints.length} elements</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
                       
                       <div className="space-y-4">
+                        <h3 className="font-medium">HyperLogLog Algorithm</h3>
                         <div className="p-4 border rounded-lg">
-                          <h4 className="font-medium mb-3">Accuracy Metrics</h4>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-sm">Error Bound</span>
-                              <span className="text-sm font-medium">
-                                {algorithmType === "distinct-counting" ? "±5%" : 
-                                 algorithmType === "reservoir-sampling" ? "Exact sample" : 
-                                 "Exact within window"}
-                              </span>
+                          <div className="flex justify-between items-center mb-4">
+                            <div>
+                              <div className="text-sm text-muted-foreground">Estimated Distinct Elements</div>
+                              <div className="text-3xl font-bold">{Math.floor(dataPoints.length * 0.85)}</div>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm">Anomalies Detected</span>
-                              <span className="text-sm font-medium">{anomalies.length}</span>
+                            <div className="text-muted-foreground">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="36"
+                                height="36"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="1"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+                              </svg>
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <h4 className="text-sm font-medium">Error Estimate</h4>
+                            <div className="w-full bg-secondary h-2 rounded-full overflow-hidden">
+                              <div 
+                                className={`bg-primary h-full rounded-full`}
+                                style={{ width: "8%" }}
+                              ></div>
+                            </div>
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                              <span>±8% error margin</span>
                             </div>
                           </div>
                         </div>
                         
                         <div className="p-4 border rounded-lg">
-                          <h4 className="font-medium mb-3">Scaling Characteristics</h4>
-                          <div className="space-y-3">
-                            <p className="text-sm text-muted-foreground">
-                              How the algorithm's performance scales with increased data volume and velocity:
-                            </p>
-                            <div className="space-y-2">
-                              <div className="space-y-1">
-                                <div className="flex justify-between">
-                                  <span className="text-xs">Processing Time</span>
-                                  <span className="text-xs">Linear</span>
-                                </div>
-                                <div className="w-full bg-secondary h-1.5 rounded-full overflow-hidden">
-                                  <div className="bg-primary h-full rounded-full" style={{ width: "100%" }}></div>
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <div className="flex justify-between">
-                                  <span className="text-xs">Memory Usage</span>
-                                  <span className="text-xs">
-                                    {algorithmType === "distinct-counting" ? "Logarithmic" : 
-                                     algorithmType === "reservoir-sampling" ? "Constant" : 
-                                     "Constant"}
-                                  </span>
-                                </div>
-                                <div className="w-full bg-secondary h-1.5 rounded-full overflow-hidden">
-                                  <div className="bg-primary h-full rounded-full" style={{ width: algorithmType === "distinct-counting" ? "30%" : "20%" }}></div>
-                                </div>
-                              </div>
-                              <div className="space-y-1">
-                                <div className="flex justify-between">
-                                  <span className="text-xs">Accuracy</span>
-                                  <span className="text-xs">
-                                    {algorithmType === "distinct-counting" ? "Diminishes" : 
-                                     algorithmType === "reservoir-sampling" ? "Constant" : 
-                                     "Constant"}
-                                  </span>
-                                </div>
-                                <div className="w-full bg-secondary h-1.5 rounded-full overflow-hidden">
-                                  <div className="bg-primary h-full rounded-full" style={{ width: algorithmType === "distinct-counting" ? "70%" : "90%" }}></div>
-                                </div>
-                              </div>
+                          <h4 className="font-medium mb-3">Key Advantages</h4>
+                          <ul className="space-y-2 text-sm text-muted-foreground">
+                            <li className="flex items-start gap-2">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="text-primary mt-0.5"
+                              >
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                              </svg>
+                              <span>Space efficient (O(log log n))</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="text-primary mt-0.5"
+                              >
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                              </svg>
+                              <span>Handles massive data streams</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="text-primary mt-0.5"
+                              >
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                              </svg>
+                              <span>More accurate than basic Flajolet-Martin</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                className="text-primary mt-0.5"
+                              >
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                              </svg>
+                              <span>Used by Google, Redis, and other big data systems</span>
+                            </li>
+                          </ul>
+                        </div>
+                        
+                        <div className="p-4 border rounded-lg">
+                          <h4 className="font-medium mb-3">Applications</h4>
+                          <div className="grid grid-cols-2 gap-2 text-sm text-muted-foreground">
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-data-blue"></div>
+                              <span>Unique visitor counting</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-data-purple"></div>
+                              <span>Database query optimization</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-data-pink"></div>
+                              <span>Network flow monitoring</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2 h-2 rounded-full bg-data-green"></div>
+                              <span>Fraud detection</span>
                             </div>
                           </div>
                         </div>
@@ -505,73 +709,101 @@ export default function DataStreams() {
                 </Card>
               </TabsContent>
               
-              <TabsContent value="analytics" className="space-y-4">
+              <TabsContent value="window" className="space-y-4">
                 <Card className="p-6">
                   <div className="space-y-6">
-                    <h3 className="text-xl font-bold">Stream Analytics</h3>
+                    <div className="space-y-1">
+                      <h2 className="text-2xl font-bold">Sliding Window Analysis</h2>
+                      <p className="text-muted-foreground">
+                        Monitor and analyze the most recent n elements in a continuous data stream
+                      </p>
+                    </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-4">
                         <div className="p-4 border rounded-lg">
-                          <h4 className="font-medium mb-3">Current Statistics</h4>
-                          <div className="space-y-2">
-                            <div className="flex justify-between">
-                              <span className="text-sm">Total Elements</span>
-                              <span className="text-sm font-medium">{dataPoints.length}</span>
+                          <h3 className="font-medium mb-3">Current Window Statistics</h3>
+                          
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                              <div className="text-sm text-muted-foreground">Avg Value</div>
+                              <div className="text-2xl font-bold">
+                                {dataPoints.length > 0 
+                                  ? (dataPoints.slice(-windowSize).reduce((sum, p) => sum + p.value, 0) / Math.min(windowSize, dataPoints.length)).toFixed(1) 
+                                  : "N/A"}
+                              </div>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm">Recent Average</span>
-                              <span className="text-sm font-medium">
-                                {dataPoints.length > 0 ? 
-                                  (dataPoints.slice(-Math.min(windowSize, dataPoints.length)).reduce((sum, p) => sum + p.value, 0) / 
-                                   Math.min(windowSize, dataPoints.length)).toFixed(2) : 
-                                  "0.00"}
-                              </span>
+                            
+                            <div className="space-y-1">
+                              <div className="text-sm text-muted-foreground">Std Deviation</div>
+                              <div className="text-2xl font-bold">
+                                {dataPoints.length > 1 
+                                  ? (() => {
+                                      const windowData = dataPoints.slice(-windowSize);
+                                      const avg = windowData.reduce((sum, p) => sum + p.value, 0) / windowData.length;
+                                      return Math.sqrt(
+                                        windowData.reduce((sum, p) => sum + Math.pow(p.value - avg, 2), 0) / windowData.length
+                                      ).toFixed(1);
+                                    })() 
+                                  : "N/A"}
+                              </div>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm">Min Value</span>
-                              <span className="text-sm font-medium">
-                                {dataPoints.length > 0 ? 
-                                  Math.min(...dataPoints.map(p => p.value)) : 
-                                  "0"}
-                              </span>
+                            
+                            <div className="space-y-1">
+                              <div className="text-sm text-muted-foreground">Min Value</div>
+                              <div className="text-2xl font-bold">
+                                {dataPoints.length > 0 
+                                  ? Math.min(...dataPoints.slice(-windowSize).map(p => p.value)) 
+                                  : "N/A"}
+                              </div>
                             </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm">Max Value</span>
-                              <span className="text-sm font-medium">
-                                {dataPoints.length > 0 ? 
-                                  Math.max(...dataPoints.map(p => p.value)) : 
-                                  "0"}
-                              </span>
+                            
+                            <div className="space-y-1">
+                              <div className="text-sm text-muted-foreground">Max Value</div>
+                              <div className="text-2xl font-bold">
+                                {dataPoints.length > 0 
+                                  ? Math.max(...dataPoints.slice(-windowSize).map(p => p.value)) 
+                                  : "N/A"}
+                              </div>
                             </div>
                           </div>
                         </div>
                         
                         <div className="p-4 border rounded-lg">
-                          <h4 className="font-medium mb-3">Anomaly Detection</h4>
-                          <div className="space-y-3">
-                            <div className="flex justify-between">
-                              <span className="text-sm">Detected Anomalies</span>
-                              <span className="text-sm font-medium">{anomalies.length}</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              Anomalies are detected using a statistical approach, identifying data points that deviate
-                              more than 2 standard deviations from the moving average within the current window size.
-                            </p>
+                          <h3 className="font-medium mb-3">Window Settings</h3>
+                          
+                          <div className="space-y-6">
                             <div className="space-y-2">
-                              <h5 className="text-sm font-medium">Recent Anomalies</h5>
-                              {anomalies.length > 0 ? (
-                                <ul className="text-xs text-muted-foreground space-y-1">
-                                  {anomalies.slice(-3).map((index, i) => (
-                                    <li key={i} className="flex justify-between">
-                                      <span>Point #{index}</span>
-                                      <span>Value: {dataPoints[index]?.value.toFixed(2) || "N/A"}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              ) : (
-                                <p className="text-xs text-muted-foreground">No anomalies detected yet.</p>
-                              )}
+                              <div className="flex justify-between">
+                                <Label>Window Size</Label>
+                                <span className="text-sm text-muted-foreground">{windowSize} points</span>
+                              </div>
+                              <Slider 
+                                value={[windowSize]} 
+                                min={5} 
+                                max={50} 
+                                step={5} 
+                                onValueChange={(value) => setWindowSize(value[0])}
+                                disabled={streamActive}
+                              />
+                            </div>
+                            
+                            <div>
+                              <div className="text-sm font-medium mb-2">Window Type</div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="border rounded-lg p-3 bg-secondary/10">
+                                  <h4 className="font-medium mb-1">Sliding Window</h4>
+                                  <p className="text-xs text-muted-foreground">
+                                    Fixed size window that slides forward with each new element
+                                  </p>
+                                </div>
+                                <div className="border rounded-lg p-3 opacity-50">
+                                  <h4 className="font-medium mb-1">Tumbling Window</h4>
+                                  <p className="text-xs text-muted-foreground">
+                                    Fixed size window that resets completely after each interval
+                                  </p>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -579,83 +811,137 @@ export default function DataStreams() {
                       
                       <div className="space-y-4">
                         <div className="p-4 border rounded-lg">
-                          <h4 className="font-medium mb-3">Stream Characteristics</h4>
-                          <div className="space-y-3">
-                            <div className="flex justify-between">
-                              <span className="text-sm">Data Type</span>
-                              <span className="text-sm font-medium capitalize">{streamType}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm">Pattern</span>
-                              <span className="text-sm font-medium">
-                                {streamType === "social" ? "Bursty" : 
-                                 streamType === "iot" ? "Periodic" : 
-                                 "Variable"}
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm">Window Type</span>
-                              <span className="text-sm font-medium">
-                                {algorithmType === "distinct-counting" ? "Full Stream" : 
-                                 algorithmType === "reservoir-sampling" ? "Reservoir" : 
-                                 "Sliding"}
-                              </span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span className="text-sm">Window Size</span>
-                              <span className="text-sm font-medium">{windowSize} elements</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="p-4 border rounded-lg">
-                          <h4 className="font-medium mb-3">Trend Analysis</h4>
-                          <div className="space-y-3">
-                            {dataPoints.length > windowSize ? (
-                              <div className="space-y-2">
-                                <div className="flex justify-between">
-                                  <span className="text-sm">Current Trend</span>
-                                  <span className="text-sm font-medium">
-                                    {(() => {
-                                      const recentPoints = dataPoints.slice(-windowSize);
-                                      const firstHalf = recentPoints.slice(0, windowSize / 2);
-                                      const secondHalf = recentPoints.slice(windowSize / 2);
-                                      
-                                      const firstAvg = firstHalf.reduce((sum, p) => sum + p.value, 0) / firstHalf.length;
-                                      const secondAvg = secondHalf.reduce((sum, p) => sum + p.value, 0) / secondHalf.length;
-                                      
-                                      const diff = secondAvg - firstAvg;
-                                      
-                                      if (diff > 5) return "Strong Upward";
-                                      if (diff > 2) return "Upward";
-                                      if (diff < -5) return "Strong Downward";
-                                      if (diff < -2) return "Downward";
-                                      return "Stable";
-                                    })()}
-                                  </span>
-                                </div>
-                                <div className="flex justify-between">
-                                  <span className="text-sm">Volatility</span>
-                                  <span className="text-sm font-medium">
-                                    {(() => {
-                                      const recentPoints = dataPoints.slice(-windowSize);
-                                      const values = recentPoints.map(p => p.value);
-                                      const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
-                                      const variance = values.reduce((sum, val) => sum + Math.pow(val - avg, 2), 0) / values.length;
-                                      const stdDev = Math.sqrt(variance);
-                                      
-                                      if (stdDev > avg * 0.5) return "High";
-                                      if (stdDev > avg * 0.2) return "Medium";
-                                      return "Low";
-                                    })()}
-                                  </span>
-                                </div>
+                          <h3 className="font-medium mb-3">Anomaly Detection Configuration</h3>
+                          
+                          <div className="space-y-4">
+                            <div className="p-3 border rounded-lg bg-primary/5">
+                              <div className="flex justify-between items-center">
+                                <h4 className="font-medium">Standard Deviation Threshold</h4>
+                                <div className="text-lg font-bold">2σ</div>
                               </div>
-                            ) : (
-                              <p className="text-xs text-muted-foreground">
-                                Not enough data points for trend analysis. Need at least {windowSize} points.
+                              <p className="text-xs text-muted-foreground mt-1">
+                                Points more than 2 standard deviations from the mean are flagged as anomalies
                               </p>
-                            )}
+                            </div>
+                            
+                            <div className="space-y-2">
+                              <div className="flex justify-between text-sm">
+                                <span>Detected Anomalies</span>
+                                <span>{anomalies.length}</span>
+                              </div>
+                              <Progress value={anomalies.length ? (anomalies.length / dataPoints.length) * 100 : 0} />
+                              <div className="text-xs text-right text-muted-foreground">
+                                {dataPoints.length ? ((anomalies.length / dataPoints.length) * 100).toFixed(1) : 0}% of data points
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="p-4 border rounded-lg bg-secondary/10">
+                          <h3 className="font-medium mb-3">Applications of Sliding Windows</h3>
+                          
+                          <div className="space-y-4">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="text-data-blue"
+                                  >
+                                    <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+                                    <path d="M12 9v4"/>
+                                    <path d="M12 17h.01"/>
+                                  </svg>
+                                  <span className="font-medium text-sm">Anomaly Detection</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground pl-6">
+                                  Identify unusual patterns in network traffic, sensor readings, or financial transactions
+                                </p>
+                              </div>
+                              
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="text-data-purple"
+                                  >
+                                    <path d="M6 16.326A3.033 3.033 0 0 1 8 13c1.5-1.5 1.5-5.5 3-7"/>
+                                    <path d="M18 8.674A3.03 3.03 0 0 1 16 12c-1.5 1.5-1.5 5.5-3 7"/>
+                                  </svg>
+                                  <span className="font-medium text-sm">Moving Averages</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground pl-6">
+                                  Smooth out short-term fluctuations to highlight longer-term trends in time series
+                                </p>
+                              </div>
+                              
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="text-data-pink"
+                                  >
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                    <line x1="18" y1="8" x2="23" y2="13"></line>
+                                    <line x1="23" y1="8" x2="18" y2="13"></line>
+                                  </svg>
+                                  <span className="font-medium text-sm">Fraud Detection</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground pl-6">
+                                  Monitor recent user behavior to identify suspicious activity patterns
+                                </p>
+                              </div>
+                              
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    className="text-data-green"
+                                  >
+                                    <rect width="20" height="14" x="2" y="3" rx="2"/>
+                                    <line x1="8" x2="16" y1="21" y2="21"/>
+                                    <line x1="12" x2="12" y1="17" y2="21"/>
+                                  </svg>
+                                  <span className="font-medium text-sm">Network Monitoring</span>
+                                </div>
+                                <p className="text-xs text-muted-foreground pl-6">
+                                  Track network traffic patterns to optimize performance and detect outages
+                                </p>
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -670,3 +956,4 @@ export default function DataStreams() {
     </Layout>
   );
 }
+
