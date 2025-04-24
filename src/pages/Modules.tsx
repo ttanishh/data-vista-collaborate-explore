@@ -3,7 +3,7 @@ import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { FileInput } from "lucide-react";
+import { FileInput, Database, ChartBar, ChartLine, ChartPie, File, ArrowRight } from "lucide-react";
 
 // Module data
 const modules = [
@@ -99,40 +99,41 @@ export default function Modules() {
             <p className="text-xl text-muted-foreground">
               Explore our six interactive modules demonstrating practical applications of advanced data science concepts.
             </p>
-            <div className="pt-4">
+            <div className="pt-6 flex flex-wrap justify-center gap-4">
               <Link to="/data-science-playground">
                 <Button className="bg-gradient-to-r from-data-blue to-data-purple text-white">
                   <FileInput className="mr-2 h-4 w-4" />
-                  Try the Data Science Playground
+                  Interactive Data Science Playground
+                </Button>
+              </Link>
+              <Link to="/modules/introduction">
+                <Button variant="outline">
+                  <File className="mr-2 h-4 w-4" />
+                  Start Learning
                 </Button>
               </Link>
             </div>
           </div>
           
-          <div className="space-y-12">
-            {modules.map((module, index) => (
-              <div 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-16">
+            {modules.map((module) => (
+              <Card 
                 key={module.id}
-                className={`flex flex-col ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} gap-8 items-center`}
+                className="overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300"
               >
-                <div className="w-full md:w-1/2">
-                  <Card className={`bg-gradient-to-br ${module.color} h-72 rounded-xl flex items-center justify-center text-white overflow-hidden relative`}>
-                    <div className="text-8xl absolute opacity-20 blur-sm animate-pulse-gentle">
-                      {module.icon}
-                    </div>
-                    <div className="text-6xl z-10">
-                      {module.icon}
-                    </div>
-                    <div className="absolute bottom-0 left-0 w-full p-4 bg-black/30 backdrop-blur-sm">
-                      <h3 className="text-lg font-bold">{module.title}</h3>
-                    </div>
-                  </Card>
+                <div className={`bg-gradient-to-br ${module.color} h-40 relative flex items-center justify-center text-white overflow-hidden`}>
+                  <div className="text-8xl absolute opacity-20 blur-sm animate-pulse-gentle">
+                    {module.icon}
+                  </div>
+                  <div className="text-6xl z-10">
+                    {module.icon}
+                  </div>
                 </div>
-                <div className="w-full md:w-1/2 space-y-4">
-                  <h2 className="text-3xl font-display font-bold">{module.title}</h2>
+                <div className="p-6 space-y-4">
+                  <h2 className="text-2xl font-display font-bold">{module.title}</h2>
                   <p className="text-muted-foreground">{module.description}</p>
                   <div>
-                    <h4 className="text-sm font-medium mb-2">Key Features</h4>
+                    <h4 className="text-sm font-medium mb-3">Key Features</h4>
                     <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
                       {module.features.map((feature, i) => (
                         <li key={i} className="flex items-center gap-2">
@@ -156,30 +157,35 @@ export default function Modules() {
                       ))}
                     </ul>
                   </div>
-                  <div>
+                  <div className="pt-4 flex flex-wrap gap-3">
                     <Link to={`/modules/${module.id}`}>
-                      <button className="text-primary hover:text-primary/80 font-medium text-sm flex items-center gap-1">
+                      <Button>
                         Explore Module
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                        >
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                          <polyline points="12 5 19 12 12 19"></polyline>
-                        </svg>
-                      </button>
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </Link>
+                    <Link to={`/data-science-playground?module=${module.id}`}>
+                      <Button variant="outline">
+                        Try in Playground
+                      </Button>
                     </Link>
                   </div>
                 </div>
-              </div>
+              </Card>
             ))}
+          </div>
+          
+          <div className="mt-20 bg-gradient-to-r from-data-blue/10 to-data-purple/10 rounded-lg p-6 md:p-10 text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to apply what you've learned?</h2>
+            <p className="text-lg text-muted-foreground mb-6 max-w-2xl mx-auto">
+              The Data Science Playground allows you to upload your own datasets and apply techniques from any module.
+            </p>
+            <Link to="/data-science-playground">
+              <Button size="lg" className="bg-gradient-to-r from-data-blue to-data-purple text-white">
+                <Database className="mr-2 h-5 w-5" />
+                Launch Data Science Playground
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

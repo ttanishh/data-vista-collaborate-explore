@@ -1,26 +1,36 @@
 
 import React, { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
-import { LineChart, BarChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, BarChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { PlaygroundTechnicalPanel } from './PlaygroundTechnicalPanel';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ChartConfig {
-  type: 'line' | 'bar';
+  type: 'line' | 'bar' | 'pie';
   data: any[];
   dataKey: string;
   colors?: string[];
 }
 
-export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
+interface UserDataPoint {
+  label: string;
+  value: number;
+  category?: string;
+}
+
+export const RealWorldDemo: React.FC<{ module: string, uploadedData?: any[] }> = ({ module, uploadedData }) => {
   const [selectedDataset, setSelectedDataset] = useState<string>('demo');
   const [userInputMode, setUserInputMode] = useState<boolean>(false);
   const [userInputValue, setUserInputValue] = useState<string>('');
   const [userInputLabel, setUserInputLabel] = useState<string>('');
+  const [userInputCategory, setUserInputCategory] = useState<string>('');
+  const [userDataPoints, setUserDataPoints] = useState<UserDataPoint[]>([]);
+  const [chartType, setChartType] = useState<'line' | 'bar' | 'pie'>('line');
   const { toast } = useToast();
   
   const chartConfigs: { [key: string]: ChartConfig } = {
@@ -130,12 +140,11 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
       colors: ['#94a3b8', '#4f46e5']
     },
     textAnalysis: {
-      type: 'bar',
+      type: 'pie',
       data: [
-        { category: 'Product Reviews', positive: 65, neutral: 20, negative: 15 },
-        { category: 'Support Tickets', positive: 40, neutral: 30, negative: 30 },
-        { category: 'Social Media', positive: 55, neutral: 25, negative: 20 },
-        { category: 'Surveys', positive: 70, neutral: 15, negative: 15 }
+        { category: 'Positive', value: 65 },
+        { category: 'Neutral', value: 20 },
+        { category: 'Negative', value: 15 }
       ],
       dataKey: 'category',
       colors: ['#22c55e', '#94a3b8', '#ef4444']
@@ -169,9 +178,48 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
     }
   };
 
+  // Process uploaded data if available
+  useEffect(() => {
+    if (uploadedData && uploadedData.length > 0) {
+      try {
+        const firstItem = uploadedData[0];
+        // Get the first property name to use as dataKey
+        const dataKey = Object.keys(firstItem)[0];
+        
+        // Create a new chart config from uploaded data
+        const newConfig: ChartConfig = {
+          type: 'line', // Default to line chart
+          data: uploadedData,
+          dataKey: dataKey,
+          colors: ['#4f46e5', '#22c55e', '#f59e0b', '#ec4899', '#6366f1'] // Default colors
+        };
+        
+        // Add the uploaded data as a new config
+        chartConfigs['uploadedData'] = newConfig;
+        
+        // Set the dataset to the uploaded data
+        setSelectedDataset('uploadedData');
+        
+        toast({
+          title: "Data loaded successfully",
+          description: `${uploadedData.length} records processed and ready for visualization.`,
+        });
+      } catch (error) {
+        console.error("Error processing uploaded data:", error);
+      }
+    }
+  }, [uploadedData, toast]);
+
   // Function to add user input data to charts
   const addUserDataPoint = () => {
-    if (!userInputValue || !userInputLabel) return;
+    if (!userInputValue || !userInputLabel) {
+      toast({
+        title: "Incomplete input",
+        description: "Please provide both label and value",
+        variant: "destructive"
+      });
+      return;
+    }
     
     const moduleKey = getModuleKey(module);
     const config = chartConfigs[moduleKey];
@@ -182,15 +230,56 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
     const newDataPoint: any = {};
     newDataPoint[config.dataKey] = userInputLabel;
     
-    // For each key in the first data item (except the dataKey)
-    Object.keys(config.data[0])
-      .filter(key => key !== config.dataKey)
-      .forEach(key => {
-        newDataPoint[key] = parseInt(userInputValue);
+    if (config.type === 'pie') {
+      // For pie charts
+      const newPoint = {
+        category: userInputLabel,
+        value: parseInt(userInputValue)
+      };
+      
+      const updatedData = [...config.data, newPoint];
+      chartConfigs[moduleKey].data = updatedData;
+    } else {
+      // For line and bar charts
+      // For each key in the first data item (except the dataKey)
+      const firstDataItem = config.data[0];
+      const dataKeys = Object.keys(firstDataItem).filter(key => key !== config.dataKey);
+      
+      if (dataKeys.length > 1 && !userInputCategory) {
+        toast({
+          title: "Category required",
+          description: "Please select a data category",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      const categoryKey = userInputCategory || dataKeys[0];
+      
+      // Create a new data point with the selected category
+      Object.keys(firstDataItem).forEach(key => {
+        if (key === config.dataKey) {
+          newDataPoint[key] = userInputLabel;
+        } else if (key === categoryKey) {
+          newDataPoint[key] = parseInt(userInputValue);
+        } else {
+          newDataPoint[key] = 0;
+        }
       });
+      
+      // Add the new data point
+      chartConfigs[moduleKey].data = [...config.data, newDataPoint];
+    }
     
-    // Add the new data point
-    chartConfigs[moduleKey].data = [...config.data, newDataPoint];
+    // Add to user data points for tracking
+    setUserDataPoints([
+      ...userDataPoints,
+      {
+        label: userInputLabel,
+        value: parseInt(userInputValue),
+        category: userInputCategory
+      }
+    ]);
     
     toast({
       title: "Data point added",
@@ -200,10 +289,14 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
     // Clear the input fields
     setUserInputValue('');
     setUserInputLabel('');
+    setUserInputCategory('');
   };
 
   const renderChart = (config: ChartConfig) => {
-    if (config.type === 'line') {
+    // Override chart type if user has selected one
+    const chartTypeToUse = chartType || config.type;
+    
+    if (chartTypeToUse === 'line') {
       return (
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={config.data}>
@@ -227,26 +320,61 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
           </LineChart>
         </ResponsiveContainer>
       );
+    } else if (chartTypeToUse === 'bar') {
+      return (
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={config.data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey={config.dataKey} />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            {Object.keys(config.data[0])
+              .filter(key => key !== config.dataKey)
+              .map((key, index) => (
+                <Bar 
+                  key={key}
+                  dataKey={key}
+                  fill={config.colors?.[index] || `#${Math.floor(Math.random()*16777215).toString(16)}`}
+                />
+              ))}
+          </BarChart>
+        </ResponsiveContainer>
+      );
+    } else if (chartTypeToUse === 'pie') {
+      // For pie charts
+      const COLORS = config.colors || ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+      
+      return (
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={config.data}
+              cx="50%"
+              cy="50%"
+              labelLine={true}
+              outerRadius={100}
+              fill="#8884d8"
+              dataKey="value"
+              nameKey={config.dataKey}
+              label={({name, percent}) => `${name}: ${(percent * 100).toFixed(0)}%`}
+            >
+              {config.data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
+      );
     }
+    
+    // Default fallback
     return (
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={config.data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey={config.dataKey} />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          {Object.keys(config.data[0])
-            .filter(key => key !== config.dataKey)
-            .map((key, index) => (
-              <Bar 
-                key={key}
-                dataKey={key}
-                fill={config.colors?.[index] || `#${Math.floor(Math.random()*16777215).toString(16)}`}
-              />
-            ))}
-        </BarChart>
-      </ResponsiveContainer>
+      <div className="h-64 flex items-center justify-center text-muted-foreground">
+        Unable to render chart - invalid configuration
+      </div>
     );
   };
 
@@ -268,6 +396,15 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
 
   const moduleKey = getModuleKey(module);
   const config = chartConfigs[moduleKey];
+  
+  // Generate category options for the current module
+  const getCategoryOptions = () => {
+    if (config && config.data && config.data.length > 0) {
+      const firstItem = config.data[0];
+      return Object.keys(firstItem).filter(key => key !== config.dataKey);
+    }
+    return [];
+  };
 
   return (
     <div className="space-y-8">
@@ -277,41 +414,93 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
             {module} Application Demo
           </h3>
           
-          <div className="flex items-center space-x-2 mb-4">
-            <Switch 
-              id="user-input-mode" 
-              checked={userInputMode}
-              onCheckedChange={setUserInputMode} 
-            />
-            <Label htmlFor="user-input-mode">Enable user input</Label>
+          <div className="flex flex-wrap gap-4 mb-4">
+            <div className="flex items-center space-x-2">
+              <Switch 
+                id="user-input-mode" 
+                checked={userInputMode}
+                onCheckedChange={setUserInputMode} 
+              />
+              <Label htmlFor="user-input-mode">Enable user input</Label>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="chart-type">Chart Type:</Label>
+              <Select value={chartType} onValueChange={(value) => setChartType(value as 'line' | 'bar' | 'pie')}>
+                <SelectTrigger className="w-32">
+                  <SelectValue placeholder="Chart Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="line">Line Chart</SelectItem>
+                  <SelectItem value="bar">Bar Chart</SelectItem>
+                  <SelectItem value="pie">Pie Chart</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
           
           {userInputMode && (
-            <div className="flex flex-col sm:flex-row gap-2 mb-4">
-              <div className="flex-1">
-                <Label htmlFor="input-label" className="sr-only">Label</Label>
-                <Input
-                  id="input-label"
-                  placeholder={`Enter ${config.dataKey} (e.g., "New Point")`}
-                  value={userInputLabel}
-                  onChange={(e) => setUserInputLabel(e.target.value)}
-                />
+            <div className="space-y-4 p-4 border rounded-lg">
+              <h4 className="font-medium">Add Custom Data Point</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div>
+                  <Label htmlFor="input-label" className="mb-1 block">Label</Label>
+                  <Input
+                    id="input-label"
+                    placeholder={`Enter ${config?.dataKey || 'label'} (e.g., "New Point")`}
+                    value={userInputLabel}
+                    onChange={(e) => setUserInputLabel(e.target.value)}
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="input-value" className="mb-1 block">Value</Label>
+                  <Input
+                    id="input-value"
+                    type="number"
+                    placeholder="Enter value (e.g., 75)"
+                    value={userInputValue}
+                    onChange={(e) => setUserInputValue(e.target.value)}
+                  />
+                </div>
+                
+                {getCategoryOptions().length > 1 && (
+                  <div>
+                    <Label htmlFor="input-category" className="mb-1 block">Data Series</Label>
+                    <Select value={userInputCategory} onValueChange={setUserInputCategory}>
+                      <SelectTrigger id="input-category">
+                        <SelectValue placeholder="Select data series" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {getCategoryOptions().map(category => (
+                          <SelectItem key={category} value={category}>{category}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
               
-              <div className="flex-1">
-                <Label htmlFor="input-value" className="sr-only">Value</Label>
-                <Input
-                  id="input-value"
-                  type="number"
-                  placeholder="Enter value (e.g., 75)"
-                  value={userInputValue}
-                  onChange={(e) => setUserInputValue(e.target.value)}
-                />
-              </div>
-              
-              <Button onClick={addUserDataPoint} disabled={!userInputValue || !userInputLabel}>
+              <Button 
+                onClick={addUserDataPoint} 
+                disabled={!userInputValue || !userInputLabel}
+                className="mt-2"
+              >
                 Add Data Point
               </Button>
+              
+              {userDataPoints.length > 0 && (
+                <div className="mt-2">
+                  <h5 className="text-sm font-medium mb-2">Added Data Points:</h5>
+                  <div className="flex flex-wrap gap-2">
+                    {userDataPoints.map((point, index) => (
+                      <div key={index} className="bg-secondary/20 text-xs rounded-full px-3 py-1">
+                        {point.label}: {point.value} {point.category ? `(${point.category})` : ''}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
           
@@ -320,6 +509,7 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
           </div>
         </div>
       </Card>
+      
       <PlaygroundTechnicalPanel 
         module={moduleKey as any}
       />
