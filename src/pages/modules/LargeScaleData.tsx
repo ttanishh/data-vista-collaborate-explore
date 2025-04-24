@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/components/ui/use-toast";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
+import { Settings, Filter, Download, X } from "lucide-react";
 
 export default function LargeScaleData() {
   const [activeTab, setActiveTab] = useState("upload");
@@ -17,6 +24,16 @@ export default function LargeScaleData() {
     accuracy: 0,
     consistency: 0,
     uniqueness: 0
+  });
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [advancedSettings, setAdvancedSettings] = useState({
+    fillMissingValues: true,
+    correctTypos: true,
+    removeDuplicates: true,
+    standardizeFormat: true,
+    removeOutliers: false,
+    normalization: "none",
+    imputationMethod: "mean"
   });
   
   const { toast } = useToast();
@@ -79,6 +96,28 @@ export default function LargeScaleData() {
         description: "Your data has been cleaned successfully.",
       });
     }, 2000);
+  };
+
+  const handleAdvancedCleaning = () => {
+    setShowAdvancedOptions(true);
+  };
+
+  const applyAdvancedSettings = () => {
+    toast({
+      title: "Advanced Cleaning Applied",
+      description: "Your custom cleaning settings have been applied successfully.",
+    });
+    
+    // Simulate improved data quality based on selected options
+    const newDataQuality = {
+      completeness: Math.min(dataQuality.completeness + (advancedSettings.fillMissingValues ? 5 : 0), 99),
+      accuracy: Math.min(dataQuality.accuracy + (advancedSettings.correctTypos ? 4 : 0), 99),
+      consistency: Math.min(dataQuality.consistency + (advancedSettings.standardizeFormat ? 6 : 0), 99),
+      uniqueness: Math.min(dataQuality.uniqueness + (advancedSettings.removeDuplicates ? 3 : 0), 99)
+    };
+    
+    setDataQuality(newDataQuality);
+    setShowAdvancedOptions(false);
   };
 
   return (
@@ -520,29 +559,169 @@ export default function LargeScaleData() {
                     <div className="flex justify-center space-x-4">
                       <Button>
                         Download Cleaned Data
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="16"
-                          height="16"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="ml-2"
-                        >
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                          <polyline points="7 10 12 15 17 10"></polyline>
-                          <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
+                        <Download size={16} className="ml-2" />
                       </Button>
-                      <Button variant="outline">
+                      
+                      <Button variant="outline" onClick={handleAdvancedCleaning}>
                         Advanced Cleaning Options
                       </Button>
                     </div>
                   </div>
                 </Card>
+                
+                {showAdvancedOptions && (
+                  <Card className="p-6 border-2 border-primary/20">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl font-bold">Advanced Cleaning Options</h3>
+                      <Button variant="ghost" size="icon" onClick={() => setShowAdvancedOptions(false)}>
+                        <X size={18} />
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <h4 className="font-medium">Data Cleaning Methods</h4>
+                          
+                          <div className="flex items-start space-x-2">
+                            <Checkbox 
+                              id="fillMissingValues" 
+                              checked={advancedSettings.fillMissingValues}
+                              onCheckedChange={(checked) => 
+                                setAdvancedSettings({...advancedSettings, fillMissingValues: !!checked})
+                              } 
+                            />
+                            <div className="grid gap-1">
+                              <Label htmlFor="fillMissingValues">Fill missing values</Label>
+                              <p className="text-xs text-muted-foreground">Use predictive imputation to fill gaps in data</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start space-x-2">
+                            <Checkbox 
+                              id="correctTypos" 
+                              checked={advancedSettings.correctTypos}
+                              onCheckedChange={(checked) => 
+                                setAdvancedSettings({...advancedSettings, correctTypos: !!checked})
+                              } 
+                            />
+                            <div className="grid gap-1">
+                              <Label htmlFor="correctTypos">Correct typos</Label>
+                              <p className="text-xs text-muted-foreground">Fix spelling errors in text fields</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start space-x-2">
+                            <Checkbox 
+                              id="removeDuplicates" 
+                              checked={advancedSettings.removeDuplicates}
+                              onCheckedChange={(checked) => 
+                                setAdvancedSettings({...advancedSettings, removeDuplicates: !!checked})
+                              } 
+                            />
+                            <div className="grid gap-1">
+                              <Label htmlFor="removeDuplicates">Remove duplicates</Label>
+                              <p className="text-xs text-muted-foreground">Identify and remove identical records</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start space-x-2">
+                            <Checkbox 
+                              id="standardizeFormat" 
+                              checked={advancedSettings.standardizeFormat}
+                              onCheckedChange={(checked) => 
+                                setAdvancedSettings({...advancedSettings, standardizeFormat: !!checked})
+                              } 
+                            />
+                            <div className="grid gap-1">
+                              <Label htmlFor="standardizeFormat">Standardize formats</Label>
+                              <p className="text-xs text-muted-foreground">Normalize date and number formats</p>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-start space-x-2">
+                            <Checkbox 
+                              id="removeOutliers" 
+                              checked={advancedSettings.removeOutliers}
+                              onCheckedChange={(checked) => 
+                                setAdvancedSettings({...advancedSettings, removeOutliers: !!checked})
+                              } 
+                            />
+                            <div className="grid gap-1">
+                              <Label htmlFor="removeOutliers">Remove outliers</Label>
+                              <p className="text-xs text-muted-foreground">Detect and remove statistical anomalies</p>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-5">
+                          <h4 className="font-medium">Advanced Settings</h4>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="normalization">Normalization Method</Label>
+                            <Select 
+                              value={advancedSettings.normalization} 
+                              onValueChange={(value) => setAdvancedSettings({...advancedSettings, normalization: value})}
+                            >
+                              <SelectTrigger id="normalization">
+                                <SelectValue placeholder="Select method" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="none">None</SelectItem>
+                                <SelectItem value="minmax">Min-Max Scaling</SelectItem>
+                                <SelectItem value="zscore">Z-Score Standardization</SelectItem>
+                                <SelectItem value="robust">Robust Scaling</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">Normalize numerical data for better analysis</p>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label htmlFor="imputation">Imputation Method</Label>
+                            <Select 
+                              value={advancedSettings.imputationMethod} 
+                              onValueChange={(value) => setAdvancedSettings({...advancedSettings, imputationMethod: value})}
+                            >
+                              <SelectTrigger id="imputation">
+                                <SelectValue placeholder="Select method" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="mean">Mean</SelectItem>
+                                <SelectItem value="median">Median</SelectItem>
+                                <SelectItem value="mode">Mode</SelectItem>
+                                <SelectItem value="knn">K-Nearest Neighbors</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">Method for filling missing values</p>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label>Outlier Detection Sensitivity</Label>
+                            <div className="pt-2">
+                              <Slider
+                                defaultValue={[2]}
+                                min={1}
+                                max={5}
+                                step={1}
+                                className="w-full"
+                              />
+                            </div>
+                            <div className="flex justify-between text-xs text-muted-foreground">
+                              <span>Conservative</span>
+                              <span>Aggressive</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex justify-center pt-4">
+                        <Button onClick={applyAdvancedSettings}>
+                          Apply Advanced Cleaning
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                )}
               </TabsContent>
             </Tabs>
           </div>
