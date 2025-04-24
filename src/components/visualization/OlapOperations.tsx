@@ -1,5 +1,12 @@
-
 import React, { useState, useMemo } from 'react';
+import { 
+  Table as TableIcon, 
+  ChevronUp as ArrowUp, 
+  ChevronDown as ArrowDown, 
+  Slice, 
+  Columns2, 
+  BarChart3 as Pivot 
+} from "lucide-react";
 import { 
   Table, 
   TableBody, 
@@ -14,7 +21,6 @@ import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Pivot, Table as TableIcon, Slice, ArrowUp, ArrowDown, Columns2 } from "lucide-react";
 
 // Sample dataset
 const initialData = [
