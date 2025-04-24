@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -11,7 +12,6 @@ import TextAnalysis from "./pages/modules/TextAnalysis";
 import DataStreams from "./pages/modules/DataStreams";
 import AdvancedAnalysis from "./pages/modules/AdvancedAnalysis";
 import DataSciencePlayground from "./pages/DataSciencePlayground";
-import Collaborate from "./pages/Collaborate";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
 import { useState, useEffect } from "react";
