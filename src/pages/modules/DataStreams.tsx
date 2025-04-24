@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
@@ -33,42 +32,33 @@ export default function DataStreams() {
   const [dataPoints, setDataPoints] = useState<any[]>([]);
   const [anomalies, setAnomalies] = useState<number[]>([]);
 
-  // Generate random data for the stream
   useEffect(() => {
     if (!streamActive) return;
     
     const interval = setInterval(() => {
-      // Generate a new data point based on the stream type
       let newValue = 0;
       
       switch (streamType) {
         case "social":
-          // Simulate social media engagement (likes, shares, etc.)
           newValue = Math.floor(Math.random() * 100) + 10;
           break;
         case "iot":
-          // Simulate IoT sensor data with some periodicity
           newValue = 50 + 30 * Math.sin(Date.now() / 10000) + Math.random() * 15;
           break;
         case "transactions":
-          // Simulate transaction volumes with occasional spikes
           newValue = Math.floor(Math.random() * 30) + 5;
           if (Math.random() > 0.95) {
-            // Occasional spike
             newValue += Math.floor(Math.random() * 100);
           }
           break;
       }
       
-      // Add some randomness based on stream speed
       const timestamp = new Date().toLocaleTimeString();
       
-      // Add the new data point
       setDataPoints(prev => {
         const newPoint = { timestamp, value: newValue };
-        const newPoints = [...prev, newPoint].slice(-100); // Keep the last 100 points
+        const newPoints = [...prev, newPoint].slice(-100);
         
-        // Check for anomalies
         if (newPoints.length > windowSize) {
           const recentPoints = newPoints.slice(-windowSize-1, -1);
           const avg = recentPoints.reduce((sum, p) => sum + p.value, 0) / recentPoints.length;
@@ -76,7 +66,6 @@ export default function DataStreams() {
             recentPoints.reduce((sum, p) => sum + Math.pow(p.value - avg, 2), 0) / recentPoints.length
           );
           
-          // Mark as anomaly if it's more than 2 standard deviations from the mean
           if (Math.abs(newValue - avg) > stdDev * 2) {
             setAnomalies(prev => [...prev, newPoints.length - 1]);
           }
@@ -267,7 +256,6 @@ export default function DataStreams() {
                         dataKey="timestamp" 
                         tick={{ fontSize: 12 }} 
                         tickFormatter={(value) => {
-                          // Only show some timestamps to avoid crowding
                           return value.split(':').slice(0, 2).join(':');
                         }}
                       />
@@ -279,7 +267,6 @@ export default function DataStreams() {
                         stroke="#8884d8" 
                         activeDot={{ r: 8 }}
                         dot={(props: any) => {
-                          // Highlight anomalies with a different dot
                           const isAnomaly = anomalies.includes(props.index);
                           if (isAnomaly) {
                             return (
@@ -288,7 +275,7 @@ export default function DataStreams() {
                               </svg>
                             );
                           }
-                          return null; // default dot
+                          return null;
                         }}
                       />
                     </LineChart>
@@ -341,7 +328,7 @@ export default function DataStreams() {
                           <h4 className="font-medium mb-3">Algorithm Steps</h4>
                           <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-2">
                             <li>Store the first k elements of the stream in the reservoir.</li>
-                            <li>For each subsequent element at position i (where i > k):
+                            <li>For each subsequent element at position i (where i {'>'}  k):
                               <ol className="list-disc list-inside ml-6 mt-2 space-y-1">
                                 <li>Generate a random number j between 1 and i.</li>
                                 <li>If j ≤ k, replace the j-th element in the reservoir with the new element.</li>
