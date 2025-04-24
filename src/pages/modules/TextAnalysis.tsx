@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Layout } from "@/components/layout/Layout";
 import { Card } from "@/components/ui/card";
@@ -6,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
+import { WordCloud } from '@/components/text-analysis/WordCloud';
+import { FrequencyAnalysis } from '@/components/text-analysis/FrequencyAnalysis';
+import { BagOfWords } from '@/components/text-analysis/BagOfWords';
 
 export default function TextAnalysis() {
   const [text, setText] = useState("");
@@ -449,54 +451,14 @@ export default function TextAnalysis() {
                   </Card>
                 </TabsContent>
                 
-                <TabsContent value="visualization" className="space-y-4">
-                  <Card className="p-6">
-                    <div className="space-y-6">
-                      <h3 className="text-xl font-bold">Text Visualizations</h3>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="p-4 border rounded-lg flex flex-col items-center justify-center min-h-[300px]">
-                          <h4 className="font-medium mb-4">Word Cloud</h4>
-                          <div className="bg-muted rounded-lg w-full h-56 flex items-center justify-center">
-                            <p className="text-muted-foreground">Word cloud visualization</p>
-                          </div>
-                        </div>
-                        
-                        <div className="p-4 border rounded-lg flex flex-col items-center justify-center min-h-[300px]">
-                          <h4 className="font-medium mb-4">Topic Distribution</h4>
-                          <div className="bg-muted rounded-lg w-full h-56 flex items-center justify-center">
-                            <p className="text-muted-foreground">Topic visualization</p>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="p-4 border rounded-lg">
-                        <h4 className="font-medium mb-3">Text Highlighting</h4>
-                        <div className="p-4 bg-secondary/10 rounded-lg">
-                          <p className="text-sm whitespace-pre-wrap">
-                            {text.split(' ').map((word, i) => {
-                              const entity = entities.find(e => e.text === word || e.text.includes(word));
-                              if (entity) {
-                                let color = 'bg-gray-200 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
-                                if (entity.type === 'Person') color = 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
-                                if (entity.type === 'Organization') color = 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
-                                if (entity.type === 'Location') color = 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
-                                if (entity.type === 'Date/Time') color = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
-                                if (entity.type === 'Money') color = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300';
-                                
-                                return (
-                                  <span key={i} className={`${color} px-1 rounded mx-0.5`} title={entity.type}>
-                                    {word}
-                                  </span>
-                                );
-                              }
-                              return <span key={i}>{word} </span>;
-                            })}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
+                <TabsContent value="visualization" className="space-y-6">
+                  {analyzed && (
+                    <>
+                      <WordCloud text={text} />
+                      <FrequencyAnalysis text={text} />
+                      <BagOfWords text={text} />
+                    </>
+                  )}
                 </TabsContent>
               </Tabs>
             )}

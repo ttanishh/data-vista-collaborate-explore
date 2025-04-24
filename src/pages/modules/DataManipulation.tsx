@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Upload, Play, ArrowRight, X } from "lucide-react";
+import { MapReduceVisualizer } from '@/components/mapreduce/MapReduceVisualizer';
 
 export default function DataManipulation() {
   const [nodeCount, setNodeCount] = useState(4);
@@ -418,6 +419,29 @@ export default function DataManipulation() {
                 </div>
                 
                 <div className="space-y-6">
+                  {fileData && (
+                    <MapReduceVisualizer 
+                      data={fileData}
+                      phase={
+                        isSimulating ? 
+                          mapProgress === 100 ? 
+                            shuffleProgress === 100 ? 
+                              reduceProgress === 100 ? 'complete' : 'reduce'
+                            : 'shuffle'
+                          : 'map'
+                        : 'map'
+                      }
+                      operation={operation}
+                      progress={{
+                        map: mapProgress,
+                        shuffle: shuffleProgress,
+                        reduce: reduceProgress
+                      }}
+                    />
+                  )}
+                </div>
+                
+                <div className="space-y-6">
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <h3 className="text-lg font-medium">Node Allocation</h3>
@@ -561,7 +585,119 @@ export default function DataManipulation() {
                 <TabsTrigger value="performance">Performance Analysis</TabsTrigger>
               </TabsList>
               
-              {/* ... keep existing code (tabs content) */}
+              <TabsContent value="concepts">
+                <Card className="p-6">
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold">Core Concepts of MapReduce</h2>
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium">1. Map</h3>
+                      <p className="text-muted-foreground">
+                        The Map phase processes each input record and produces intermediate key-value pairs.
+                        This step is highly parallelizable, allowing for distributed processing across multiple nodes.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium">2. Shuffle and Sort</h3>
+                      <p className="text-muted-foreground">
+                        The Shuffle phase sorts and groups the intermediate key-value pairs by key.
+                        This ensures that all values associated with the same key are sent to the same reducer.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium">3. Reduce</h3>
+                      <p className="text-muted-foreground">
+                        The Reduce phase processes the data for each key and produces the final output.
+                        This step aggregates, filters, or transforms the data as needed.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium">4. Fault Tolerance</h3>
+                      <p className="text-muted-foreground">
+                        MapReduce is designed to be fault-tolerant. If a node fails during processing,
+                        the framework automatically reassigns the task to another node.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="code">
+                <Card className="p-6">
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold">MapReduce Pseudocode</h2>
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium">Map Function</h3>
+                      <pre className="bg-secondary/50 rounded-md p-4">
+                        <code>
+                          <p><b>map</b>(String key, String value):</p>
+                          <p className="ml-4"><b>for each</b> word w <b>in</b> value:</p>
+                          <p className="ml-8">EmitIntermediate(w, "1");</p>
+                        </code>
+                      </pre>
+                      <p className="text-muted-foreground">
+                        The Map function processes each word in the input value and emits an intermediate key-value pair.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium">Reduce Function</h3>
+                      <pre className="bg-secondary/50 rounded-md p-4">
+                        <code>
+                          <p><b>reduce</b>(String key, Iterator values):</p>
+                          <p className="ml-4">count = 0;</p>
+                          <p className="ml-4"><b>for each</b> v <b>in</b> values:</p>
+                          <p className="ml-8">count += ParseInt(v);</p>
+                          <p className="ml-4">Emit(key, count);</p>
+                        </code>
+                      </pre>
+                      <p className="text-muted-foreground">
+                        The Reduce function sums all the counts for each word and emits the final result.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </TabsContent>
+              
+              <TabsContent value="performance">
+                <Card className="p-6">
+                  <div className="space-y-4">
+                    <h2 className="text-xl font-bold">Performance Analysis</h2>
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium">1. Data Locality</h3>
+                      <p className="text-muted-foreground">
+                        MapReduce attempts to move the computation close to the data, minimizing network traffic.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium">2. Parallelism</h3>
+                      <p className="text-muted-foreground">
+                        The Map and Reduce phases are highly parallelizable, allowing for distributed processing across multiple nodes.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium">3. Scalability</h3>
+                      <p className="text-muted-foreground">
+                        MapReduce can scale to process large datasets by adding more nodes to the cluster.
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-medium">4. Optimization</h3>
+                      <p className="text-muted-foreground">
+                        Techniques such as combining, compression, and partitioning can be used to optimize MapReduce jobs.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              </TabsContent>
             </Tabs>
           </div>
         </div>
