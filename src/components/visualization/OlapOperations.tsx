@@ -178,6 +178,11 @@ const OlapOperations: React.FC = () => {
           </Select>
         </div>
         
+        <div className="border rounded-lg p-4 bg-background/50">
+          <h3 className="text-lg font-medium mb-4">3D Visualization</h3>
+          <OlapCube3D operation={operation} />
+        </div>
+
         {/* Controls for specific operations */}
         {operation === 'slice' && (
           <div className="flex flex-wrap gap-4 items-center p-3 bg-muted/40 rounded-md">
