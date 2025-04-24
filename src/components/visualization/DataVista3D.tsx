@@ -11,7 +11,7 @@ function DataCube({ position = [0, 0, 0], color = '#4f46e5' }) {
   return (
     <mesh
       ref={meshRef}
-      position={position as [number, number, number]}
+      position={position}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
       scale={hovered ? 1.2 : 1}
@@ -32,7 +32,7 @@ function FloatingGraph() {
       const x = (Math.random() - 0.5) * 10
       const y = (Math.random() - 0.5) * 10
       const z = (Math.random() - 0.5) * 10
-      pts.push(new THREE.Vector3(x, y, z))
+      pts.push([x, y, z])
     }
     return pts
   }, [])
@@ -40,24 +40,18 @@ function FloatingGraph() {
   return (
     <group>
       {points.map((point, i) => {
-        // Only connect points that are somewhat close to each other
         if (i === points.length - 1) return null
         
+        const nextPoint = points[(i + 1) % points.length]
+        const linePoints = [
+          new THREE.Vector3(point[0], point[1], point[2]),
+          new THREE.Vector3(nextPoint[0], nextPoint[1], nextPoint[2])
+        ]
+        
+        const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints)
+        
         return (
-          <line key={i}>
-            <bufferGeometry>
-              <bufferAttribute
-                attach="attributes-position"
-                count={2}
-                array={new Float32Array([
-                  points[i].x, points[i].y, points[i].z,
-                  points[(i + 1) % points.length].x,
-                  points[(i + 1) % points.length].y,
-                  points[(i + 1) % points.length].z
-                ])}
-                itemSize={3}
-              />
-            </bufferGeometry>
+          <line key={i} geometry={lineGeometry}>
             <lineBasicMaterial color="#6366f1" />
           </line>
         )
@@ -72,7 +66,6 @@ function Grid() {
     <gridHelper 
       args={[20, 20, '#4338ca', '#6366f1']}
       position={[0, -2, 0]} 
-      rotation={[0, 0, 0]}
     />
   )
 }
