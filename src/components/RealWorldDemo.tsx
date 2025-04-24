@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Card } from "@/components/ui/card";
-import { LineChart, BarChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { LineChart, BarChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { PlaygroundTechnicalPanel } from './PlaygroundTechnicalPanel';
 
 interface ChartConfig {
@@ -91,7 +91,31 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
   const renderChart = (config: ChartConfig) => {
     if (config.type === 'line') {
       return (
-        <LineChart width={600} height={300} data={config.data}>
+        <ResponsiveContainer width="100%" height={300}>
+          <LineChart data={config.data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey={config.dataKey} />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            {Object.keys(config.data[0])
+              .filter(key => key !== config.dataKey)
+              .map((key, index) => (
+                <Line 
+                  key={key}
+                  type="monotone"
+                  dataKey={key}
+                  stroke={config.colors?.[index] || `#${Math.floor(Math.random()*16777215).toString(16)}`}
+                  strokeWidth={2}
+                />
+              ))}
+          </LineChart>
+        </ResponsiveContainer>
+      );
+    }
+    return (
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={config.data}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey={config.dataKey} />
           <YAxis />
@@ -100,34 +124,14 @@ export const RealWorldDemo: React.FC<{ module: string }> = ({ module }) => {
           {Object.keys(config.data[0])
             .filter(key => key !== config.dataKey)
             .map((key, index) => (
-              <Line 
+              <Bar 
                 key={key}
-                type="monotone"
                 dataKey={key}
-                stroke={config.colors?.[index]}
-                strokeWidth={2}
+                fill={config.colors?.[index] || `#${Math.floor(Math.random()*16777215).toString(16)}`}
               />
             ))}
-        </LineChart>
-      );
-    }
-    return (
-      <BarChart width={600} height={300} data={config.data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey={config.dataKey} />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        {Object.keys(config.data[0])
-          .filter(key => key !== config.dataKey)
-          .map((key, index) => (
-            <Bar 
-              key={key}
-              dataKey={key}
-              fill={config.colors?.[index]}
-            />
-          ))}
-      </BarChart>
+        </BarChart>
+      </ResponsiveContainer>
     );
   };
 
