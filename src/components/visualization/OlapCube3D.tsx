@@ -1,7 +1,7 @@
 
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import * as THREE from 'three';
 
 interface CubeProps {
@@ -9,12 +9,35 @@ interface CubeProps {
   color?: string;
   size?: number;
   opacity?: number;
+  animate?: boolean;
 }
 
-function DataCube({ position, color = '#4f46e5', size = 1, opacity = 1 }: CubeProps) {
+function DataCube({ position, color = '#4f46e5', size = 1, opacity = 1, animate = false }: CubeProps) {
   const [hovered, setHovered] = useState(false);
   const meshRef = useRef<THREE.Mesh>(null);
   
+  useEffect(() => {
+    if (animate && meshRef.current) {
+      const y = position[1];
+      // Start slightly above final position for animation
+      meshRef.current.position.y = y + 2;
+      
+      // Animate to final position
+      const animateIn = () => {
+        if (!meshRef.current) return;
+        
+        if (meshRef.current.position.y > y) {
+          meshRef.current.position.y -= 0.1;
+          requestAnimationFrame(animateIn);
+        } else {
+          meshRef.current.position.y = y;
+        }
+      };
+      
+      animateIn();
+    }
+  }, [animate, position]);
+
   return (
     <mesh
       ref={meshRef}
@@ -28,13 +51,25 @@ function DataCube({ position, color = '#4f46e5', size = 1, opacity = 1 }: CubePr
         color={hovered ? '#22c55e' : color} 
         transparent 
         opacity={opacity}
+        emissive={hovered ? '#22c55e' : color}
+        emissiveIntensity={0.2}
       />
     </mesh>
   );
 }
 
 // Create a custom line component that doesn't use the problematic Three.js line implementation
-function CustomLine({ start, end, color = "#6366f1" }: { start: [number, number, number], end: [number, number, number], color?: string }) {
+function CustomLine({ 
+  start, 
+  end, 
+  color = "#6366f1",
+  thickness = 0.03
+}: { 
+  start: [number, number, number], 
+  end: [number, number, number], 
+  color?: string,
+  thickness?: number 
+}) {
   const ref = useRef<THREE.Mesh>(null);
   
   // Calculate the midpoint and direction
@@ -61,8 +96,8 @@ function CustomLine({ start, end, color = "#6366f1" }: { start: [number, number,
       position={[midX, midY, midZ]} 
       rotation={[euler.x, euler.y, euler.z]}
     >
-      <cylinderGeometry args={[0.03, 0.03, length, 8]} />
-      <meshStandardMaterial color={color} />
+      <cylinderGeometry args={[thickness, thickness, length, 8]} />
+      <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.2} />
     </mesh>
   );
 }
@@ -72,6 +107,15 @@ interface Props {
 }
 
 export function OlapCube3D({ operation }: Props) {
+  const [showAnimation, setShowAnimation] = useState(false);
+  
+  // Reset animation when operation changes
+  useEffect(() => {
+    setShowAnimation(false);
+    const timer = setTimeout(() => setShowAnimation(true), 100);
+    return () => clearTimeout(timer);
+  }, [operation]);
+
   const getVisualization = () => {
     switch (operation) {
       case 'rollup':
@@ -82,7 +126,7 @@ export function OlapCube3D({ operation }: Props) {
             <DataCube position={[0, -1, 0]} />
             <DataCube position={[2, -1, 0]} />
             {/* Aggregated cube */}
-            <DataCube position={[0, 1, 0]} color="#ec4899" size={1.5} />
+            <DataCube position={[0, 1, 0]} color="#ec4899" size={1.5} animate={showAnimation} />
             {/* Connection lines using custom line implementation */}
             <CustomLine start={[-2, -1, 0]} end={[0, 1, 0]} />
             <CustomLine start={[0, -1, 0]} end={[0, 1, 0]} />
@@ -90,13 +134,34 @@ export function OlapCube3D({ operation }: Props) {
           </group>
         );
       
+      case 'drilldown':
+        return (
+          <group>
+            {/* Show a parent cube splitting into multiple detailed cubes */}
+            <DataCube position={[0, 1.5, 0]} color="#a855f7" opacity={0.4} size={1.5} />
+            <DataCube position={[-1.5, -0.5, -1]} color="#06b6d4" animate={showAnimation} />
+            <DataCube position={[-1.5, -0.5, 1]} color="#06b6d4" animate={showAnimation} />
+            <DataCube position={[1.5, -0.5, -1]} color="#06b6d4" animate={showAnimation} />
+            <DataCube position={[1.5, -0.5, 1]} color="#06b6d4" animate={showAnimation} />
+            <CustomLine start={[0, 1.5, 0]} end={[-1.5, -0.5, -1]} color="#a855f7" />
+            <CustomLine start={[0, 1.5, 0]} end={[-1.5, -0.5, 1]} color="#a855f7" />
+            <CustomLine start={[0, 1.5, 0]} end={[1.5, -0.5, -1]} color="#a855f7" />
+            <CustomLine start={[0, 1.5, 0]} end={[1.5, -0.5, 1]} color="#a855f7" />
+          </group>
+        );
+      
       case 'slice':
         return (
           <group>
             {/* Show a cube being sliced */}
-            <DataCube position={[-1.5, 0, 0]} opacity={0.3} />
-            <DataCube position={[0, 0, 0]} color="#ec4899" />
-            <DataCube position={[1.5, 0, 0]} opacity={0.3} />
+            <DataCube position={[-2, 0, 0]} opacity={0.3} />
+            <DataCube position={[0, 0, 0]} color="#ec4899" animate={showAnimation} />
+            <DataCube position={[2, 0, 0]} opacity={0.3} />
+            {/* Slice plane */}
+            <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+              <planeGeometry args={[3, 3]} />
+              <meshBasicMaterial color="#ec4899" transparent opacity={0.15} side={THREE.DoubleSide} />
+            </mesh>
           </group>
         );
       
@@ -104,12 +169,18 @@ export function OlapCube3D({ operation }: Props) {
         return (
           <group>
             {/* Show multiple smaller cubes being selected */}
-            <DataCube position={[-1, 1, 0]} size={0.8} color="#ec4899" />
+            <DataCube position={[-1, 1, 0]} size={0.8} color="#ec4899" animate={showAnimation} />
             <DataCube position={[1, 1, 0]} opacity={0.3} size={0.8} />
-            <DataCube position={[-1, -1, 0]} size={0.8} color="#ec4899" />
+            <DataCube position={[-1, -1, 0]} size={0.8} color="#ec4899" animate={showAnimation} />
             <DataCube position={[1, -1, 0]} opacity={0.3} size={0.8} />
-            <DataCube position={[0, 0, 1]} size={0.8} color="#ec4899" />
+            <DataCube position={[0, 0, 1]} size={0.8} color="#ec4899" animate={showAnimation} />
             <DataCube position={[0, 0, -1]} opacity={0.3} size={0.8} />
+            
+            {/* Highlighting box around selected cubes */}
+            <mesh position={[0, 0, 0]} scale={[2.8, 2.8, 2.8]}>
+              <boxGeometry args={[1, 1, 1]} />
+              <meshBasicMaterial color="#ec4899" wireframe={true} />
+            </mesh>
           </group>
         );
       
@@ -118,33 +189,57 @@ export function OlapCube3D({ operation }: Props) {
           <group>
             {/* Show cube rotation */}
             <DataCube position={[-2, 0, 0]} />
-            <DataCube position={[2, 0, 0]} color="#ec4899" />
-            <CustomLine start={[-2, 0, 0]} end={[2, 0, 0]} />
+            <DataCube position={[2, 0, 0]} color="#ec4899" animate={showAnimation} />
+            <CustomLine start={[-2, 0, 0]} end={[2, 0, 0]} thickness={0.05} />
+            
+            {/* Rotation axis */}
+            <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI / 2]}>
+              <cylinderGeometry args={[0.05, 0.05, 6, 16]} />
+              <meshStandardMaterial color="#22c55e" emissive="#22c55e" emissiveIntensity={0.2} />
+            </mesh>
+            
+            {/* Rotation arrows */}
+            <mesh position={[0, 0, 0]} rotation={[0, 0, 0]}>
+              <torusGeometry args={[2.5, 0.08, 8, 32, Math.PI / 2]} />
+              <meshStandardMaterial color="#22c55e" emissive="#22c55e" emissiveIntensity={0.2} />
+            </mesh>
           </group>
         );
       
+      case 'original':
       default:
         return (
           <group>
-            <DataCube position={[0, 0, 0]} />
+            {/* Basic data cube with dimensions */}
+            <DataCube position={[0, 0, 0]} size={1.5} />
+            
+            {/* Dimension labels as lines */}
+            <CustomLine start={[0, 0, 0]} end={[2, 0, 0]} color="#22c55e" />
+            <CustomLine start={[0, 0, 0]} end={[0, 2, 0]} color="#ec4899" />
+            <CustomLine start={[0, 0, 0]} end={[0, 0, 2]} color="#06b6d4" />
           </group>
         );
     }
   };
 
   return (
-    <div className="w-full h-64 bg-muted/20 rounded-lg overflow-hidden">
+    <div className="w-full h-64 bg-muted/20 rounded-lg overflow-hidden border">
       <Canvas
-        camera={{ position: [4, 4, 4], fov: 50 }}
+        camera={{ position: [5, 5, 5], fov: 50 }}
+        dpr={[1, 2]} // Better rendering on high-DPI displays
       >
-        <ambientLight intensity={0.5} />
-        <pointLight position={[10, 10, 10]} />
+        <ambientLight intensity={0.6} />
+        <pointLight position={[10, 10, 10]} intensity={0.8} />
+        <spotLight position={[-10, -10, -10]} angle={0.15} penumbra={1} intensity={0.5} />
         {getVisualization()}
         <OrbitControls 
-          enableZoom={false}
+          enableZoom={true}
           autoRotate={true}
-          autoRotateSpeed={2}
+          autoRotateSpeed={3}
+          minDistance={3}
+          maxDistance={15}
         />
+        <gridHelper args={[10, 10, '#6b7280', '#6b7280']} position={[0, -2, 0]} />
       </Canvas>
     </div>
   );
