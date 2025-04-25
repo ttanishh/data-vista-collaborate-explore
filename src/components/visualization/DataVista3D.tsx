@@ -4,14 +4,19 @@ import { OrbitControls } from '@react-three/drei'
 import { Suspense, useState, useRef, useMemo } from 'react'
 import * as THREE from 'three'
 
-function DataCube({ position = [0, 0, 0], color = '#4f46e5' }) {
+interface DataCubeProps {
+  position?: [number, number, number];
+  color?: string;
+}
+
+function DataCube({ position = [0, 0, 0], color = '#4f46e5' }: DataCubeProps) {
   const [hovered, setHovered] = useState(false)
-  const meshRef = useRef()
+  const meshRef = useRef<THREE.Mesh>(null)
   
   return (
     <mesh
       ref={meshRef}
-      position={position as [number, number, number]}
+      position={position}
       onPointerOver={() => setHovered(true)}
       onPointerOut={() => setHovered(false)}
       scale={hovered ? 1.2 : 1}
@@ -37,41 +42,45 @@ function FloatingGraph() {
     return pts
   }, [])
   
-  // Use useMemo to create all line geometries once
-  const lines = useMemo(() => {
-    const linesArray = []
-    
-    for (let i = 0; i < points.length; i++) {
-      if (i === points.length - 1) continue
-      
-      const point = points[i]
-      const nextPoint = points[(i + 1) % points.length]
-      
-      const linePoints = [
-        new THREE.Vector3(point[0], point[1], point[2]),
-        new THREE.Vector3(nextPoint[0], nextPoint[1], nextPoint[2])
-      ]
-      
-      const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints)
-      linesArray.push({ id: i, geometry: lineGeometry })
-    }
-    
-    return linesArray
-  }, [points])
-  
   return (
     <group>
-      {lines.map(line => (
-        <primitive 
-          key={line.id} 
-          object={new THREE.Line(
-            line.geometry,
-            new THREE.LineBasicMaterial({ color: '#6366f1' })
-          )} 
-        />
-      ))}
+      {points.map((point, i) => {
+        if (i === points.length - 1) return null;
+        
+        const nextPoint = points[(i + 1) % points.length];
+        
+        // Create line segments manually using custom Line component
+        return (
+          <Line 
+            key={i} 
+            start={[point[0], point[1], point[2]]} 
+            end={[nextPoint[0], nextPoint[1], nextPoint[2]]} 
+            color="#6366f1"
+          />
+        );
+      })}
     </group>
   )
+}
+
+// Custom Line component that works with react-three-fiber v8
+function Line({ start, end, color = "#6366f1" }: { start: number[], end: number[], color?: string }) {
+  const ref = useRef<THREE.Line>(null);
+  
+  const points = useMemo(() => {
+    const lineGeometry = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(start[0], start[1], start[2]),
+      new THREE.Vector3(end[0], end[1], end[2])
+    ]);
+    return lineGeometry;
+  }, [start, end]);
+
+  return (
+    <line ref={ref}>
+      <bufferGeometry attach="geometry" {...points} />
+      <lineBasicMaterial attach="material" color={color} />
+    </line>
+  );
 }
 
 // Simple grid for reference
