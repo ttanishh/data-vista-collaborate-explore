@@ -54,8 +54,10 @@ const modules = [
 export default function Index() {
   return (
     <Layout>
+      <ContributorsSection />
+      
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
+      <section className="relative pt-20 pb-20 overflow-hidden">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col items-center text-center space-y-8 md:space-y-12">
             <div className="space-y-4 max-w-3xl animate-fade-in">
@@ -210,9 +212,6 @@ export default function Index() {
           </div>
         </div>
       </section>
-      
-      {/* Contributors Section */}
-      <ContributorsSection />
       
       {/* CTA Section */}
       <section className="py-20">

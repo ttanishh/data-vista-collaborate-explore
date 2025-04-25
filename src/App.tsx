@@ -83,7 +83,7 @@ const App = () => {
                     animate={{ y: 0 }}
                     transition={{ delay: 0.2, duration: 0.5 }}
                   >
-                    DataVista
+                    DataMate
                   </motion.div>
                   <motion.div 
                     className="mt-4 text-xl text-muted-foreground text-center"
