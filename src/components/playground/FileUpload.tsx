@@ -11,9 +11,20 @@ interface FileUploadProps {
   uploadedFile: File | null;
   onFileUpload: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onClearData: () => void;
+  acceptedFileTypes?: string;
+  className?: string;
 }
 
-export const FileUpload = ({ uploadedFile, onFileUpload, onClearData }: FileUploadProps) => {
+export const FileUpload = ({ 
+  uploadedFile, 
+  onFileUpload, 
+  onClearData,
+  acceptedFileTypes = ".json,.csv", 
+  className = "" 
+}: FileUploadProps) => {
+  const { toast } = useToast();
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   const handleDownloadSample = () => {
     const sampleData = JSON.stringify(sampleDataFormats, null, 2);
     const blob = new Blob([sampleData], { type: 'application/json' });
@@ -27,8 +38,12 @@ export const FileUpload = ({ uploadedFile, onFileUpload, onClearData }: FileUplo
     URL.revokeObjectURL(url);
   };
 
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
+    <div className={`flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center ${className}`}>
       <Upload className="h-8 w-8 text-muted-foreground mb-2" />
       <p className="mb-2 text-sm text-muted-foreground">
         {uploadedFile ? uploadedFile.name : "No file selected"}
@@ -36,16 +51,19 @@ export const FileUpload = ({ uploadedFile, onFileUpload, onClearData }: FileUplo
       <div className="flex flex-col gap-2">
         <Input
           type="file"
-          accept=".json,.csv"
+          accept={acceptedFileTypes}
           className="hidden"
           id="data-upload"
+          ref={fileInputRef}
           onChange={onFileUpload}
         />
-        <Label htmlFor="data-upload" className="cursor-pointer">
-          <Button variant="outline" size="sm">
-            Choose File
-          </Button>
-        </Label>
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={triggerFileInput}
+        >
+          Choose File
+        </Button>
         <Button 
           variant="outline" 
           size="sm" 

@@ -1,16 +1,14 @@
-
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/components/ui/use-toast";
 import { RealWorldDemo } from './RealWorldDemo';
+import { FileUpload } from './playground/FileUpload';
 import { 
-  Upload, 
   Database, 
   FileInput, 
   FileOutput, 
@@ -72,7 +70,6 @@ export function DataSciencePlayground({ defaultModule = 'introduction' }: DataSc
     { id: 'heatmap', name: 'Heat Map' }
   ];
 
-  // Sample datasets for downloading
   const sampleDatasets = [
     {
       name: "Urban Mobility Data",
@@ -303,7 +300,8 @@ export function DataSciencePlayground({ defaultModule = 'introduction' }: DataSc
       mimeType = "application/json";
       fileExt = "json";
     } else if (dataset.format === "CSV") {
-      dataStr = dataset.data as string; // Already in CSV format
+      // Simple CSV parsing
+      dataStr = dataset.data as string;
       mimeType = "text/csv";
       fileExt = "csv";
     } else {
@@ -333,7 +331,6 @@ export function DataSciencePlayground({ defaultModule = 'introduction' }: DataSc
     });
   };
 
-  // Function to load sample dataset directly into the playground
   const loadSampleDataset = (index: number) => {
     const dataset = sampleDatasets[index];
     let data;
@@ -437,38 +434,11 @@ export function DataSciencePlayground({ defaultModule = 'introduction' }: DataSc
             
             <div className="p-4 border rounded-lg space-y-4">
               <h3 className="font-medium">3. Upload Your Data</h3>
-              <div className="flex flex-col items-center justify-center border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
-                <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-                <p className="mb-2 text-sm text-muted-foreground">
-                  {uploadedFile ? uploadedFile.name : "No file selected"}
-                </p>
-                <Input
-                  type="file"
-                  accept=".json,.csv"
-                  className="hidden"
-                  id="data-upload"
-                  onChange={handleFileUpload}
-                />
-                <Label htmlFor="data-upload" className="cursor-pointer">
-                  <Button variant="outline" size="sm">
-                    Choose File
-                  </Button>
-                </Label>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Supported formats: JSON, CSV
-                </p>
-                {uploadedFile && (
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="mt-2 text-destructive hover:text-destructive/80"
-                    onClick={clearData}
-                  >
-                    <Trash size={14} className="mr-1" />
-                    Clear Data
-                  </Button>
-                )}
-              </div>
+              <FileUpload
+                uploadedFile={uploadedFile}
+                onFileUpload={handleFileUpload}
+                onClearData={clearData}
+              />
             </div>
             
             {advancedSettings && (
