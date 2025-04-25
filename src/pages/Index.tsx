@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Layout } from "@/components/layout/Layout";
@@ -60,10 +59,10 @@ export default function Index() {
           <div className="flex flex-col items-center text-center space-y-8 md:space-y-12">
             <div className="space-y-4 max-w-3xl animate-fade-in">
               <h1 className="text-4xl md:text-6xl font-display font-bold gradient-heading">
-                DataVista: Interactive Data Science Portfolio
+                DataMate: Interactive Data Science Portfolio
               </h1>
               <p className="text-xl text-muted-foreground md:text-2xl text-balance max-w-2xl mx-auto">
-                Explore practical applications of data science through six interactive modules with cutting-edge visualizations.
+                Presented by MISBAH, AAYUDH, NEEM, TANISH, and RAJ - Explore practical applications of data science through six interactive modules with cutting-edge visualizations.
               </p>
             </div>
             
