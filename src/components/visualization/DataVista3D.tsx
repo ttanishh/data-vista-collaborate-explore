@@ -1,6 +1,6 @@
 
 import { Canvas } from '@react-three/fiber'
-import { OrbitControls } from '@react-three/drei'
+import { OrbitControls, Line as DreiLine } from '@react-three/drei'
 import { Suspense, useState, useRef, useMemo } from 'react'
 import * as THREE from 'three'
 
@@ -49,12 +49,13 @@ function FloatingGraph() {
         
         const nextPoint = points[(i + 1) % points.length];
         
-        // Create line segments manually using custom Line component
         return (
-          <Line 
+          <CustomLine 
             key={i} 
-            start={[point[0], point[1], point[2]]} 
-            end={[nextPoint[0], nextPoint[1], nextPoint[2]]} 
+            points={[
+              new THREE.Vector3(point[0], point[1], point[2]),
+              new THREE.Vector3(nextPoint[0], nextPoint[1], nextPoint[2])
+            ]}
             color="#6366f1"
           />
         );
@@ -64,22 +65,18 @@ function FloatingGraph() {
 }
 
 // Custom Line component that works with react-three-fiber v8
-function Line({ start, end, color = "#6366f1" }: { start: number[], end: number[], color?: string }) {
-  const ref = useRef<THREE.Line>(null);
-  
-  const points = useMemo(() => {
-    const lineGeometry = new THREE.BufferGeometry().setFromPoints([
-      new THREE.Vector3(start[0], start[1], start[2]),
-      new THREE.Vector3(end[0], end[1], end[2])
-    ]);
-    return lineGeometry;
-  }, [start, end]);
+interface CustomLineProps {
+  points: THREE.Vector3[];
+  color?: string;
+}
 
+function CustomLine({ points, color = "#6366f1" }: CustomLineProps) {
   return (
-    <line ref={ref}>
-      <bufferGeometry attach="geometry" {...points} />
-      <lineBasicMaterial attach="material" color={color} />
-    </line>
+    <DreiLine 
+      points={points}
+      color={color}
+      lineWidth={1}
+    />
   );
 }
 
