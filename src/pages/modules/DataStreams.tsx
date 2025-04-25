@@ -1,4 +1,3 @@
-
 import { Layout } from "@/components/layout/Layout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { CountMinSketch } from '@/components/datastreams/CountMinSketch';
@@ -8,6 +7,59 @@ import { StockAnalyzer } from '@/components/datastreams/StockAnalyzer';
 import { FileUpload } from '@/components/playground/FileUpload';
 import { useState } from 'react';
 import { useToast } from "@/components/ui/use-toast";
+import { ModuleExplanation } from "@/components/modules/ModuleExplanation";
+
+const moduleTopics = [
+  {
+    name: "Count-Min Sketch",
+    description: "An efficient probabilistic data structure for frequency estimation in data streams",
+    example: `// Count-Min Sketch Example
+const width = 4;  // Number of hash functions
+const depth = 1000;  // Size of each hash table
+const cms = new CountMinSketch(width, depth);
+
+// Adding items to the stream
+cms.add("item1");
+cms.add("item2");
+cms.add("item1");
+
+// Query frequency
+const freq = cms.estimate("item1"); // Returns approximate frequency`
+  },
+  {
+    name: "Bloom Filters",
+    description: "Space-efficient probabilistic data structure for set membership testing",
+    example: `// Bloom Filter Example
+const size = 1000;  // Filter size
+const hashFunctions = 3;  // Number of hash functions
+const bloom = new BloomFilter(size, hashFunctions);
+
+// Adding elements
+bloom.add("element1");
+bloom.add("element2");
+
+// Testing membership
+const isMember = bloom.test("element1"); // Returns true
+const notMember = bloom.test("element3"); // Likely returns false`
+  },
+  {
+    name: "Real-time Stock Analysis",
+    description: "Analyzing streaming stock data for pattern detection and anomaly identification",
+    example: `// Stock Stream Analysis
+const stockStream = new StockAnalyzer({
+  windowSize: 60,  // 60-second window
+  threshold: 0.02  // 2% change threshold
+});
+
+// Processing incoming data
+stockStream.onData((price) => {
+  const analysis = stockStream.analyze(price);
+  if (analysis.isAnomaly) {
+    console.log("Anomaly detected!");
+  }
+});`
+  }
+];
 
 export default function DataStreams() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
@@ -86,12 +138,11 @@ export default function DataStreams() {
       <section className="pt-32 pb-20">
         <div className="container px-4 md:px-6">
           <div className="space-y-8 max-w-5xl mx-auto">
-            <div className="space-y-4 text-center">
-              <h1 className="text-4xl font-bold">Mining Data Streams</h1>
-              <p className="text-xl text-muted-foreground">
-                Explore real-time data processing algorithms and visualizations
-              </p>
-            </div>
+            <ModuleExplanation
+              title="Mining Data Streams"
+              description="Explore real-time data processing algorithms and learn how to handle continuous data streams efficiently."
+              topics={moduleTopics}
+            />
 
             <div className="p-4 border rounded-lg bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
               <h2 className="text-lg font-semibold mb-4">Upload Your Data</h2>

@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 
 export function Footer() {
@@ -8,7 +7,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <span className="text-xl font-display font-bold">DataVista</span>
+              <span className="text-xl font-display font-bold">DataMate</span>
               <span className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-md font-medium">
                 CS322
               </span>
@@ -72,12 +71,16 @@ export function Footer() {
           </div>
           
           <div className="space-y-3">
-            <h4 className="font-medium text-sm">About</h4>
+            <h4 className="font-medium text-sm">Contributors</h4>
+            <ul className="space-y-2">
+              <li className="text-sm text-muted-foreground">MISBAH</li>
+              <li className="text-sm text-muted-foreground">AAYUDH</li>
+              <li className="text-sm text-muted-foreground">NEEM</li>
+              <li className="text-sm text-muted-foreground">TANISH</li>
+              <li className="text-sm text-muted-foreground">RAJ</li>
+            </ul>
             <p className="text-sm text-muted-foreground">
-              Final project for CS322 - Data Science course, demonstrating interactive data science applications.
-            </p>
-            <p className="text-sm text-muted-foreground">
-              © 2025 DataVista. All rights reserved.
+              Final project for CS322 - Data Science course.
             </p>
           </div>
         </div>

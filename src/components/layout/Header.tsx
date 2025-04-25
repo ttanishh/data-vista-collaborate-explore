@@ -27,7 +27,7 @@ export function Header() {
       <div className="container flex items-center justify-between h-16 px-4 md:px-6">
         <div className="flex items-center gap-6">
           <Link to="/" className="flex items-center gap-2">
-            <span className="text-xl font-display font-bold">DataVista</span>
+            <span className="text-xl font-display font-bold">DataMate</span>
             <span className="text-xs bg-secondary text-secondary-foreground px-2 py-0.5 rounded-md font-medium">
               CS322
             </span>
